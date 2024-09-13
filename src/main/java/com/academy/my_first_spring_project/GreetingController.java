@@ -25,9 +25,10 @@ public class GreetingController {
     @ResponseBody
     public Person personJson() {
         // Objekt erstellen, zB aus Datenbank holen, sonstige Business-Logik
-        Person person = new Person();
-        person.setId(1L);
-        person.setName("Max");
+        Person person = Person.builder()
+                .id(7L)
+                .name("Paul")
+                .build();
         // zB stattdessen so eine Business-Logik, die mir eine Person mit Id 7 aus der Datenbank holt:
 //        Person person = personRepository.findById(7);
 
