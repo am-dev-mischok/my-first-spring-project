@@ -20,4 +20,17 @@ public class GreetingController {
         model.addAttribute("inputName", someName);
         return "greeting";
     }
+
+    @GetMapping("/person")
+    @ResponseBody
+    public Person personJson() {
+        // Objekt erstellen, zB aus Datenbank holen, sonstige Business-Logik
+        Person person = new Person();
+        person.setId(1L);
+        person.setName("Max");
+        // zB stattdessen so eine Business-Logik, die mir eine Person mit Id 7 aus der Datenbank holt:
+//        Person person = personRepository.findById(7);
+
+        return person;
+    }
 }
