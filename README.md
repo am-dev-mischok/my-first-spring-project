@@ -3,7 +3,7 @@ Erstellt zusammen mit Umschülern in der Mischok Academy, Modul Software-Archite
 
 # My first Spring Backend (+Thymeleaf Frontend)
 
-Das hier ist eine Schritt-für-Schritt-Anleitung für die Erstellung eines ersten Spring Backends. Entstanden im Rahmen vom Modul "Software-Architektur 1" in der Mischok Academy. Erste Version von Alex.
+Das hier ist eine Schritt-für-Schritt-Anleitung für die Erstellung eines ersten Spring Backends. Entstanden im Rahmen vom Modul "Software-Architektur 1" in der Mischok Academy.
 
 ## Was wir bauen
 TODO ALEX aufschreiben
@@ -32,36 +32,41 @@ Vorab (TODO):
 
 ### Leeres Spring Projekt mit passenden Dependencies starten
 
-- ausführliches Spring Tutorial, falls man es selbst mal durchlesen möchte, für die ersten paar Schritte: https://spring.io/guides/gs/serving-web-content
-	- das dort anfangs verlinkte pre-initialized project herunterladen: https://start.spring.io/#!type=maven-project&language=java&packaging=jar&jvmVersion=11&groupId=com.example&artifactId=serving-web-content&name=serving-web-content&description=Demo%20project%20for%20Spring%20Boot&packageName=com.example.serving-web-content&dependencies=web,thymeleaf,devtools
-	- Spring initializr mit Auswahl:
-    - TODO SCREENSHOT
-		- Spring Web
-		- Thymeleaf
-		- Spring Boot DevTools
-  - das legt uns direkt die richtigen Dependencies in die maven `pom.xml`:
-    ```xml
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-thymeleaf</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-web</artifactId>
-    </dependency>
+Ausgangspunkt ist ein ausführliches [Spring Tutorial zu "*Serving Web Content with Spring MVC*"](https://spring.io/guides/gs/serving-web-content), falls man es selbst mal durchlesen möchte (lückenhaft und teilweise nicht so gut). In unserer Anleitung gehen wir darüber hinaus und nutzen u.a. Annotations von **Lombok**, bekommen auch **JSON** als Antwort von unseren Endpunkten, verschicken **POST-Requests** und binden eine **H2-Datenbank** ein.
 
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-devtools</artifactId>
-      <scope>runtime</scope>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-test</artifactId>
-      <scope>test</scope>
-    </dependency>
-    ```
+Wir starten mit der Grundstruktur, die wir aus dem [Spring initializr](https://start.spring.io/) herausbekommen.
+- entweder die Vorauswahl in [diesem pre-initialized project](https://start.spring.io/#!type=maven-project&language=java&packaging=jar&jvmVersion=11&groupId=com.example&artifactId=serving-web-content&name=serving-web-content&description=Demo%20project%20for%20Spring%20Boot&packageName=com.example.serving-web-content&dependencies=web,thymeleaf,devtools) herunterladen
+- oder selbst im [Spring initializr](https://start.spring.io/) mit Auswahl:
+  - Maven als Buildtool
+  - Textfelder passend ausfüllen
+  - Dependencies auswählen:
+    - Spring Web
+    - Thymeleaf
+    - Spring Boot DevTools
+- diese Dependencies liegen dann direkt in unserer Maven-Verwaltungs-Datei `pom.xml`:
+  ```xml
+  <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-thymeleaf</artifactId>
+  </dependency>
+  <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+  </dependency>
+
+  <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-devtools</artifactId>
+    <scope>runtime</scope>
+    <optional>true</optional>
+  </dependency>
+  <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-test</artifactId>
+    <scope>test</scope>
+  </dependency>
+  ```
+- dieses Startprojekt am besten direkt auch mit Hilfe von **git** versionieren, optional auch remote auf GitLab oder GitHub, und im Laufe der Anleitung passende Commits erstellen.
 
 ### in IntelliJ öffnen und einfachen GET-Endpunkt erstellen
 - in IntelliJ öffnen, am besten direkt die `pom.xml` auswählen
@@ -84,9 +89,8 @@ Vorab (TODO):
           }
       }
       ```
-	- Code ähnlich wie in Tutorial (mit eingesetzter model-Variable) dann später, wenn wir es ohne Variable ausprobiert haben
 - erstelle `greeting.html` in `src/main/resources/templates`
-	- Code aus Anleitung kopieren, aber hier noch `${name}` rausnehmen (evtl Zeile ersetzen und auskommentieren).
+	- Code aus [Spring-Anleitung](https://spring.io/guides/gs/serving-web-content#initial) kopieren, aber hier noch `${name}` rausnehmen (evtl Zeile ersetzen und auskommentieren).
     - ACHTUNG!: die einzelnen Anführungszeichen um `Hello World!` im folgenden Beispielcode sind wichtig! Durch die doppelten Anführungszeichen wird erst der Input für Thymeleaf ermöglicht, aber dann muss man die einzelnen Anführungszeichen noch als String-Delimiter setzen. Das nicht zu tun, wäre so verwerflich, wie in Java `String text = Hello World!;` ohne String-Delimiter zu schreiben.
     ```html
     <!DOCTYPE HTML>
@@ -100,47 +104,51 @@ Vorab (TODO):
     </body>
     </html>
     ```
-    - beachte beim Code-Beispiel von dem Tutorial die Pipe-Zeichen "`|`", durch die man in Spring Strings markiert, in denen man Platzhalter ähnlich wie bei Javascript Strings einsetzen kann. Für diese Anleitung lieber Strings konkatenieren wie in basic Java
+    - beachte beim Code-Beispiel von der [Spring-Anleitung](https://spring.io/guides/gs/serving-web-content#initial) die Pipe-Zeichen "`|`", durch die man in Spring Strings markiert, in denen man Platzhalter ähnlich wie bei Javascript Strings einsetzen kann. Für diese Anleitung lieber Strings konkatenieren wie in basic Java
 
 ### Backend lokal laufen lassen mit maven
-- bei IntelliJ auf Play drücken, oder vorher Rechtsklick auf die `pom.xml` und dort "Ausführen" (mit grünem Play-Symbol daneben) oder sowas anklicken, oder auf die Java-Klasse mit der main Rechtsklick und "Ausführen". Nach dem ersten erfolgreichen Run sollte bei IntelliJ oben rechts ein grüner Play-Button verfügbar sein.
+Zum Ausführen des Projekts lernen wir zwei Möglichkeiten:
+- in einer IDE: bei IntelliJ auf Play drücken, oder vorher Rechtsklick auf die `pom.xml` und dort "Ausführen" (mit grünem Play-Symbol daneben) oder sowas anklicken, oder auf die Java-Klasse mit der main Rechtsklick und "Ausführen". Nach dem ersten erfolgreichen Run sollte bei IntelliJ oben rechts ein grüner Play-Button verfügbar sein.
 - ohne IntelliJ oder sonstige IDE: Terminal öffnen im Projektordner und ausführen:
   ```
   ./mvnw spring-boot:run
   ```
+
+Bis wir die Ausführung im Terminal wieder stoppen, können wir jetzt unseren Endpunkt erreichen, zB in einem Webbrowser wie Firefox.
 - aufrufen: http://localhost:8080/greeting
-- jetzt Controller ähnlich wie im Tutorial schreiben
-  - mit `@RequestParam` und Variable eingefügt in `model`, dafür auch das Thymeleaf Template (`greeting.html`) anpassen
+
+Jetzt ändern wir den Inhalt im Thymeleaf-Template durch einen Request-Parameter am Ende der URL. Dafür müssen wir unseren Controller anpassen:
+- mit `@RequestParam` und Variable eingefügt in `model`, dafür auch das Thymeleaf Template (`greeting.html`) anpassen
+  ```java
+  @GetMapping("/greeting")
+  public String greeting(@RequestParam(name = "name", required = false, defaultValue = "World") String someName, Model model) {
+      model.addAttribute("name", someName);
+      return "greeting";
+  }
+  ```
+  ```html
+  <p th:text="'Hello ' + ${name} + '!'"></p>
+  ```
+  ```
+  localhost:8080/greeting
+  localhost:8080/greeting?name=Alex
+  ```
+  - die Variable beim `@RequestParam` auch mal "`someName`" oder so nennen, um abzugrenzen vom RequestParam `name="name"` <- letzteren auch mal nur `"n"` nennen oder `"u"`. Alternativer Endpunkt und `<p>`-Tag in Thymeleaf und was man im Browser aufrufen muss:
     ```java
-    @GetMapping("/greeting")
-    public String greeting(@RequestParam(name = "name", required = false, defaultValue = "World") String someName, Model model) {
-        model.addAttribute("name", someName);
+    @GetMapping
+    public String greeting(@RequestParam(name = "n", required = false, defaultValue = "World") String someName, Model model) {
+        model.addAttribute("inputName", someName);
         return "greeting";
     }
     ```
     ```html
-    <p th:text="'Hello ' + ${name} + '!'"></p>
+    <p th:text="'Hello ' + ${inputName} + '!'"></p>
     ```
     ```
     localhost:8080/greeting
-    localhost:8080/greeting?name=Alex
+    localhost:8080/greeting?n=Alex
     ```
-    - die Variable beim `@RequestParam` auch mal "`someName`" oder so nennen, um abzugrenzen vom RequestParam `name="name"` <- letzteren auch mal nur `"n"` nennen oder `"u"`. Alternativer Endpunkt und `<p>`-Tag in Thymeleaf und was man im Browser aufrufen muss:
-      ```java
-      @GetMapping
-      public String greeting(@RequestParam(name = "n", required = false, defaultValue = "World") String someName, Model model) {
-          model.addAttribute("inputName", someName);
-          return "greeting";
-      }
-      ```
-      ```html
-      <p th:text="'Hello ' + ${inputName} + '!'"></p>
-      ```
-      ```
-      localhost:8080/greeting
-      localhost:8080/greeting?n=Alex
-      ```
-  - beachte, dass man die ganzen Bezeichnungen hierüber (someName, n, inputName) auch alle gleich benennen könnte, zB "name". Die sind hier nur verschieden, um klar zu machen, welcher Name was tut.
+- beachte, dass man die ganzen Bezeichnungen hierüber (`someName`, `n`, `inputName`) auch alle gleich benennen könnte, zB "name". Die sind hier nur verschieden, um klar zu machen, welcher Name was tut.
 
 ## Abstecher zu JSON als Antwort, Lombok und statische Seiten
 
