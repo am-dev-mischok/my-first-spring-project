@@ -6,6 +6,7 @@ Erstellt zusammen mit Umschülern in der Mischok Academy, Modul Software-Archite
 Das hier ist eine Schritt-für-Schritt-Anleitung für die Erstellung eines ersten Spring Backends. Entstanden im Rahmen vom Modul "Software-Architektur 1" in der Mischok Academy. Erste Version von Alex.
 
 ## Was wir bauen
+TODO ALEX aufschreiben
 
 ## Prerequisites
 - Betriebssystem: Ubuntu wäre gut
