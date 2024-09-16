@@ -5,7 +5,7 @@ Erstellt zusammen mit Umschülern in der Mischok Academy, Modul Software-Archite
 
 Das hier ist eine Schritt-für-Schritt-Anleitung für die Erstellung eines ersten [Spring](https://spring.io/) Backends. Entstanden im Rahmen vom Modul "Software-Architektur 1" in der Mischok Academy.
 
-## Was wir bauen
+## 0) Was wir bauen
 Eine funktionierende, kleine ***Spring***-Anwendung, mit folgenden Funktionalitäten
 - Dependencies verwalten mit ***Maven*** in einer `pom.xml`
 - **GET**- und **POST-Requests** annehmen
@@ -25,18 +25,20 @@ Eine funktionierende, kleine ***Spring***-Anwendung, mit folgenden Funktionalit�
   - *Datenbank-Migrations* mit ***Flyway***, um initiale Queries und andere Datenbankänderungen reproduzierbar und automatisiert durchzuführen
 - *Automatisierte Tests* (Coming Soon, im Modul Software-Architektur 2)
 
-## Prerequisites
-- Betriebssystem: Ubuntu wäre gut
+## 1) Voraussetzungen
+- Vorwissen:
+  - **Java** Grundlagen
+  - **Terminal** in einem Ordner öffnen und keine Angst davor haben
+  - optional: **git** installiert und Grundlagen dafür gelernt, um nach jedem Schritt (oder nach wenigen Schritten) einen schönen neuen Commit anzulegen
+- Betriebssystem: **Ubuntu** wäre gut
 - im Terminal installierte/verfügbare Programme:
-  - mvn
-  - curl
+  - **mvn**
+  - **curl**
 - IntelliJ oder anderer Editor / IDE
-  - mit Java 17 oder höher
-- Optional:
-  - git installiert und Grundlagen dafür gelernt, um nach jedem Schritt (oder nach wenigen Schritten) einen schönen neuen Commit anzulegen
+  - mit Java **17** oder höher
 
 
-## Start und ein erster Endpunkt
+## 2) Start und ein erster Endpunkt
 
 ### Leeres Spring Projekt mit passenden Dependencies starten
 
@@ -159,10 +161,10 @@ Jetzt ändern wir den Inhalt im Thymeleaf-Template durch einen Request-Parameter
     ```
 - beachte, dass man die ganzen Bezeichnungen hierüber (`someName`, `n`, `inputName`) auch alle gleich benennen könnte, zB "name". Die sind hier nur verschieden, um klar zu machen, welcher Name was tut.
 
-## Abstecher zu JSON als Antwort, Lombok und statische Seiten
+## 3) JSON als Antwort, Lombok und statische Seiten
 
 ### JSON als Antwort vom Endpunkt
-Als nächstes wollen wir vom Endpunkt aus json zurückgeben. Dafür nicht mehr mit Thymeleaf und mit dem model und String-Rückgabe beim Endpunkt. Sondern wir geben einfach ein POJO zurück und Spring-Web konvertiert das mit Jackson für uns direkt zu einem JSON-Objekt.
+Als nächstes wollen wir vom Endpunkt aus json zurückgeben. Dafür nicht mehr mit Thymeleaf und mit dem model und String-Rückgabe beim Endpunkt. Sondern wir geben einfach ein POJO (=*Plain Old Java Object*) zurück und Spring-Web konvertiert das mit Jackson für uns direkt zu einem JSON-Objekt.
 
 <!-- - bevor wir mehr Endpunkte aufrufen, verschieben wir das `"/greeting"` von `@GetMapping` (und löschen da die dann leere Klammer) und setzen stattdessen für den ganzen Controller oben direkt unter `@Controller` diese Zeile:`@RequestMapping("/greeting")` -->
 - jetzt brauchen wir ein POJO, das wir dann zurückgeben können. Für diese Anleitung Arbeiten wir beispielhaft mit einer Klasse `Person`:
@@ -230,7 +232,7 @@ Wir löschen in unserem POJO die Getter und Setter und nutzen stattdessen die pa
       private String name;
   }
   ```
-- optional: `@Builder`-Annotation einsetzen, um unser POJO mit dem Builder-Pattern zu erzeugen, statt mit Konstruktoren und hinterher gesetzten Werten zu Arbeiten.
+- optional: `@Builder`-Annotation einsetzen, um unser POJO im Stile des dem Builder-Patterns zu erzeugen, statt mit Konstruktoren und hinterher gesetzten Werten zu arbeiten.
   - Vorsicht bei Lombok: Die `@Builder`-Annotation macht den leeren Konstrktur kaputt macht bei der POJO, d.h. wenn man den braucht, braucht man noch die Lombok-Annotation `@NoArgsConstructor`. Dann aber geht der Builder wieder kaputt, außer man setzt dann noch die Annotation `@AllArgsConstructor`.
   ```java
   import lombok.Builder;
@@ -261,10 +263,12 @@ Wir löschen in unserem POJO die Getter und Setter und nutzen stattdessen die pa
 
 
 
-<!--
+
 ### Welcome Page
 Damit wir uns nicht die Pfade merken müssen, basteln wir uns eine statische, stinknormale HTML-Startseite, ganz ohne Thymeleaf.
-In dieser zeigen wir die Links klickbar an.
+Spring (bzw. Spring Boot?) erkennt alle in `src/main/resources/static` abgelegten HTML-Dateien und antwortet auf GET-Requests mit einem Pfad, der sich mit dem Pfad von abgelegten Dateien auf `static/` deckt, mit der entsprechenden HTML-Datei.
+
+In folgender Hauptseite (`static/index.html`) zeigen wir unsere bisherigen Links klickbar an.
 Dafür legen wir eine Datei `index.html` in den Ordner `src/main/resources/static`:
   ```html
   <!DOCTYPE HTML>
@@ -283,10 +287,34 @@ Dafür legen wir eine Datei `index.html` in den Ordner `src/main/resources/stati
   </body>
   </html>
   ```
-  - wie wir die Unterseite mit Input öffnen können, ohne ihn selbst in die URL zu schreiben, sehen wir in Kürze. TODO ALEX check ob GET mit Form mit Request Params geht!!
-    Zunächst reichen uns diese beiden fest gesetzten Links
+  <!-- - wie wir die Unterseite mit Input öffnen können, ohne ihn selbst in die URL zu schreiben, sehen wir in Kürze. TODO ALEX check ob GET mit Form mit Request Params geht!!
+    Zunächst reichen uns diese beiden fest gesetzten Links -->
 
 
+## Optionaler Abschweifer: Kollaborativ arbeiten mit git (hier: Github)
+Gemeinsam erweitern wir unsere Hauptseite um weitere Begrüßungslinks.
+Folgende konzeptionellen Schritte müssen wir dafür durchgehen:
+- wir ziehen uns mit `git clone` den aktuellen Stand vom Dozenten
+- erstellen dann jeweils einen neuen Branch
+- implementieren unseren Teil und erstellen einen Commit
+- diesen neuen Branch laden wir hoch
+- bei Github erstellen wir einen *Pull Request* (bei Gitlab anderer Name: *Merge Request*), sodass der Dozent die Änderungen sehen und automatisiert bei sich einpflegen kann
+
+Dafür werden wir folgende Befehle brauchen:
+- `git clone`
+  - `git clone <URL_TO_REPO>` lädt ein Projekt von Github oder Gitlab runter auf unseren Laptop, inklusive aller git-Sachen, die dran hängen
+- `git branch`
+  - Branch erstellen: `git branch <BRANCH_NAME>`, dann müssen wir noch wechseln zum gerade erstellten Branch
+- `git checkout`
+  - zu einem Branch wechseln: `git checkout <BRANCH_NAME>`
+  - einen Branch erstellen und direkt dahin wechseln: `git checkout -b <BRANCH_NAME>`
+  - alle lokalen Änderungen einer Datei rückgängig machen, die noch nicht commitet wurden (Vorsicht, die Änderungen sind für immer weg!): `git checkout <FILE_NAME>`
+- `git merge`
+  - `git merge <BRANCH_NAME>` versucht, die Änderungen des angegebenen Branches in den rein zu ziehen, in dem wir uns aktuell lokal befinden
+  - `git mergetool` zum Nutzen einer optional eingerichteten Software, mit der mögliche Merge Konflikte mit einer GUI behandelt werden können
+
+
+<!--
 ## POST-Requests und HTML-forms
 
 ### POST-Request basteln im Backend
@@ -303,6 +331,8 @@ Später und später auch persistieren
   - JSON-Endpunkt, der uns einfach ein JSON mit true oder false zurückgibt, wenn etwas geklappt hat, und vielleicht auch ein paar der mitgeschickten Daten
     - mit curl Testen, Infos im JSON-Body mitschicken
   - jetzt auch mit Thymeleaf als Rückgabe, zuerst mit curl und die HTML-Antwort im Terminal bestaunen, aber nichts weiter damit anfangen
+
+TODO ALEX
 
 ### POST-Request mit HTML-Form
 Die Daten, die wir im Body mitschicken, wollen aus einer Eingabe vom User nehmen.
@@ -438,3 +468,4 @@ INSERT INTO journal_entry VALUES (2, 'Abend', 'hammer', 'Was ein Tag es war, was
 
 - am Ende noch User-Authentication und Rollen einbauen???
 -->
+
