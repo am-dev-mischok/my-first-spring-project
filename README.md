@@ -155,19 +155,19 @@ Jetzt ändern wir den Inhalt im Thymeleaf-Template durch einen Request-Parameter
     ```html
     <p th:text="'Hello ' + ${inputName} + '!'"></p>
     ```
-    ```
-    localhost:8080/greeting
-    localhost:8080/greeting?n=Alex
-    ```
-- beachte, dass man die ganzen Bezeichnungen hierüber (`someName`, `n`, `inputName`) auch alle gleich benennen könnte, zB "name". Die sind hier nur verschieden, um klar zu machen, welcher Name was tut.
+- beachte, dass man die ganzen Bezeichnungen hierüber (`someName`, `n`, `inputName`) auch alle gleich benennen könnte, zB "name".
+  Die sind hier nur verschieden, um klar zu machen, welcher Name was tut.
 
 ## 3) JSON als Antwort, Lombok und statische Seiten
 
 ### JSON als Antwort vom Endpunkt
-Als nächstes wollen wir vom Endpunkt aus json zurückgeben. Dafür nicht mehr mit Thymeleaf und mit dem model und String-Rückgabe beim Endpunkt. Sondern wir geben einfach ein POJO (=*Plain Old Java Object*) zurück und Spring-Web konvertiert das mit Jackson für uns direkt zu einem JSON-Objekt.
+Als nächstes wollen wir vom Endpunkt aus json zurückgeben.
+Dafür nicht mehr mit Thymeleaf und mit dem model und String-Rückgabe beim Endpunkt.
+Sondern wir geben einfach ein POJO (=*Plain Old Java Object*) zurück und Spring-Web konvertiert das mit Jackson für uns direkt zu einem JSON-Objekt.
 
 <!-- - bevor wir mehr Endpunkte aufrufen, verschieben wir das `"/greeting"` von `@GetMapping` (und löschen da die dann leere Klammer) und setzen stattdessen für den ganzen Controller oben direkt unter `@Controller` diese Zeile:`@RequestMapping("/greeting")` -->
-- jetzt brauchen wir ein POJO, das wir dann zurückgeben können. Für diese Anleitung Arbeiten wir beispielhaft mit einer Klasse `Person`:
+- jetzt brauchen wir ein POJO, das wir dann zurückgeben können.
+  Für diese Anleitung Arbeiten wir beispielhaft mit einer Klasse `Person`:
   ```java
   package com.example.simple;
 
@@ -207,9 +207,12 @@ Als nächstes wollen wir vom Endpunkt aus json zurückgeben. Dafür nicht mehr m
 
 
 ### Lombok Annotations
-Wir löschen in unserem POJO die Getter und Setter und nutzen stattdessen die passenden Annotations von Lombok. Mehr Infos [bei Baeldung](https://www.baeldung.com/intro-to-project-lombok).
+Wir löschen in unserem POJO die Getter und Setter und nutzen stattdessen die passenden Annotations von Lombok.
+Mehr Infos [bei Baeldung](https://www.baeldung.com/intro-to-project-lombok).
 - So aktivieren wir Lombok in IntelliJ:
-  - Dependency in die `pom.xml` packen. Am besten recherchieren wir dafür alle selbst, wie wir die Dependency kriegen. Suchmaschine: "maven lombok"
+  - Dependency in die `pom.xml` packen.
+    Am besten recherchieren wir dafür alle selbst, wie wir die Dependency kriegen.
+    Suchmaschine: "maven lombok"
     ```xml
     <dependency>
       <groupId>org.projectlombok</groupId>
@@ -217,7 +220,8 @@ Wir löschen in unserem POJO die Getter und Setter und nutzen stattdessen die pa
       <version>1.18.34</version>
     </dependency>
     ```
-  - dann noch bei IntelliJ sollte ein kleiner Dialog aufploppen mit "Enable Lombok Annotation Processing"
+  - jetzt würde das schon compilen, aber damit IntelliJ das für die Unterstützung beim Code Schreiben auch versteht, müssen wir das Plugin Lombok noch installieren.
+  Dann eventuell noch bei IntelliJ bei kleinem aufploppendem Dialog auf den Button mit "Enable Lombok Annotation Processing" klicken
 - jetzt löschen wir bei unserem POJO die Getter und Setter und setzen stattdessen lombok-Annotations:
   ```java
   package com.example.simple;
@@ -261,9 +265,6 @@ Wir löschen in unserem POJO die Getter und Setter und nutzen stattdessen die pa
   }
   ```
 
-
-
-
 ### Welcome Page
 Damit wir uns nicht die Pfade merken müssen, basteln wir uns eine statische, stinknormale HTML-Startseite, ganz ohne Thymeleaf.
 Spring (bzw. Spring Boot?) erkennt alle in `src/main/resources/static` abgelegten HTML-Dateien und antwortet auf GET-Requests mit einem Pfad, der sich mit dem Pfad von abgelegten Dateien auf `static/` deckt, mit der entsprechenden HTML-Datei.
@@ -287,10 +288,112 @@ Dafür legen wir eine Datei `index.html` in den Ordner `src/main/resources/stati
   </body>
   </html>
   ```
-  <!-- - wie wir die Unterseite mit Input öffnen können, ohne ihn selbst in die URL zu schreiben, sehen wir in Kürze. TODO ALEX check ob GET mit Form mit Request Params geht!!
+  - wie wir die Unterseite mit Input öffnen können, ohne ihn selbst in die URL zu schreiben, sehen wir in Kürze. TODO ALEX check ob GET mit Form mit Request Params geht!!
     Zunächst reichen uns diese beiden fest gesetzten Links -->
 
 
+## Thymeleaf mit Styling
+
+Wie auch in HTML-Dateien, können wir oben im `<head>`-Tag Thymeleaf-Template eine CSS-Datei mithilfe des HTML-Tags `<link>` einbinden.
+Damit das Backend, auch wenn es gebaut ist und auf irgendeinem Server läuft, noch den Pfad zur Datei findet, nutzen wir Thymeleafs URL-Syntax.
+Dadurch können wir den Pfad ab dem Ordner `src/main/resources/static/` angeben.
+Dafür schreiben wir im `<link>`-Tag: `th:href="@{/...}"`.
+
+Mehr zu [Thymeleafs URL-Syntax in der Dokumentation](https://www.thymeleaf.org/doc/articles/standardurlsyntax.html).
+
+Als Beispiel stylen wir unser Template für die Begrüßung.
+- erstellen unter `src/main/resources/static/greeting-styles/boring.css` eine CSS-Datei:
+  ```css
+  p {
+    font-family: monospace;
+    font-weight: bold;
+    font-size: 5rem;
+    font-style: italic;
+  }
+  ```
+- in der `greeting.html` fügen innterhalb vom `<head>`-Tag den folgenden Tag hinzu:
+  ```html
+  <link rel="stylesheet" th:href="@{/greeting-styles/boring.css}">
+  ```
+
+### CSS je nach RequestParam
+Jetzt wollen wir eine weitere CSS-Datei erstellen und diese nutzen, wenn ein passender RequestParam beim GET-Request mitgegeben wurde.
+- Endpunkt anpassen:
+  ```java
+  @GetMapping("/greeting")
+  public String greeting(
+          @RequestParam(name = "n", required = false, defaultValue = "World") String someName,
+          @RequestParam(name = "css", required = false, defaultValue = "") String cssFileName,
+          Model model
+  ) {
+      model.addAttribute("inputName", someName);
+      model.addAttribute("cssFileName", cssFileName);
+      return "greeting";
+  }
+  ```
+- diese für Thymeleaf bereitgelegte Variable `cssFileName` setzen wir ein im Template.
+  Als Default verwenden wir aber weiterhin unsere alte CSS-Datei, falls der RequestParam leer geblieben ist.
+  Dafür basteln wir uns den String für den fertigen Pfad zusammen, u.a. mit der aus Java bekannten String-Methode `.isEmpty()`:
+  ```html
+  <!DOCTYPE HTML>
+  <html xmlns:th="http://www.thymeleaf.org">
+  <head>
+      <title>Hallo :-)</title>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <!--    <link rel="stylesheet" th:href="@{/greeting-styles/boring.css}">-->
+      <link
+        rel="stylesheet"
+        th:href="@{'/greeting-styles/' + ${cssFileName.isEmpty() ? 'boring' : cssFileName} + '.css'}"
+      >
+  </head>
+  <body>
+      <p th:text="'Hello ' + ${inputName} + '!'"></p>
+  </body>
+  </html>
+  ```
+- neue CSS-Datei könnte unter `src/main/resources/static/greeting-styles/style-alex.css` erstellt werden und so aussehen:
+  ```css
+  p {
+    color: darkcyan;
+    background-color: white;
+    padding: 0.5rem 4rem;
+
+    transition: background-color 0.5s, scale 0.5s, rotate 1s;
+
+    font-weight: bold;
+    font-family: Arial;
+    font-size: 5rem;
+  }
+  p:hover {
+    background-color: black;
+    scale: -1.2 1.2;
+    rotate: 4deg;
+  }
+
+  body {
+    background-color: darkcyan;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    height: 100vh;
+    width: 100vw;
+  }
+  ```
+- in unserer Hauptseite unter `src/main/resources/static/index.html` passen wir den zweiten `<p>`-Tag an, sodass er die Begrüßung mit dem richtigen Style aufruft:
+  ```html
+  <p>
+      Bist du Alex? Dann <a href="/greeting?n=Alex&css=style-alex">bitte hier</a>.
+  </p>
+  ```
+
+Die alte, jetzt auskommentierte Zeile `<link rel="stylesheet" th:href="@{/greeting-styles/boring.css}">` in `greeting.html` könnten wir auch drinnen lassen, damit dieses Styling auch dann greift, wenn der in `cssFileName` mitgegebene Wert nicht zu einer existierenden CSS-Datei passt.
+In der ausgewählten CSS-Datei können alle Werte aus `boring.css` überschrieben werden, weil bei CSS neuere Regeln alte überschreiben.
+
+
+
+<!--
 ## Optionaler Abschweifer: Kollaborativ arbeiten mit git (hier: Github)
 Gemeinsam erweitern wir unsere Hauptseite um weitere Begrüßungslinks.
 Folgende konzeptionellen Schritte müssen wir dafür durchgehen:
@@ -301,20 +404,104 @@ Folgende konzeptionellen Schritte müssen wir dafür durchgehen:
 - bei Github erstellen wir einen *Pull Request* (bei Gitlab anderer Name: *Merge Request*), sodass der Dozent die Änderungen sehen und automatisiert bei sich einpflegen kann
 
 Dafür werden wir folgende Befehle brauchen:
-- `git clone`
-  - `git clone <URL_TO_REPO>` lädt ein Projekt von Github oder Gitlab runter auf unseren Laptop, inklusive aller git-Sachen, die dran hängen
-- `git branch`
-  - Branch erstellen: `git branch <BRANCH_NAME>`, dann müssen wir noch wechseln zum gerade erstellten Branch
-- `git checkout`
-  - zu einem Branch wechseln: `git checkout <BRANCH_NAME>`
-  - einen Branch erstellen und direkt dahin wechseln: `git checkout -b <BRANCH_NAME>`
-  - alle lokalen Änderungen einer Datei rückgängig machen, die noch nicht commitet wurden (Vorsicht, die Änderungen sind für immer weg!): `git checkout <FILE_NAME>`
-- `git merge`
-  - `git merge <BRANCH_NAME>` versucht, die Änderungen des angegebenen Branches in den rein zu ziehen, in dem wir uns aktuell lokal befinden
-  - `git mergetool` zum Nutzen einer optional eingerichteten Software, mit der mögliche Merge Konflikte mit einer GUI behandelt werden können
+1. `git clone`
+    - `git clone <URL_TO_REPO>` lädt ein Projekt von Github oder Gitlab runter auf unseren Laptop, inklusive aller git-Sachen, die dran hängen
+2. `git branch`
+    - Branch erstellen: `git branch <BRANCH_NAME>`, dann müssen wir noch wechseln zum gerade erstellten Branch
+3. `git checkout`
+    - zu einem Branch wechseln: `git checkout <BRANCH_NAME>`
+    - einen Branch erstellen und direkt dahin wechseln: `git checkout -b <BRANCH_NAME>`
+    - alle lokalen Änderungen einer Datei rückgängig machen, die noch nicht commitet wurden (Vorsicht, die Änderungen sind für immer weg!): `git checkout <FILE_NAME>`
+4. `git merge`
+    - `git merge <BRANCH_NAME>` versucht, die Änderungen des angegebenen Branches in den rein zu ziehen, in dem wir uns aktuell lokal befinden
+    - `git mergetool` zum Nutzen einer optional eingerichteten Software, mit der mögliche Merge Konflikte mit einer GUI behandelt werden können
+
+Nach Ausführen von Schritten 1 bis 3, können wir lokal das Projekt in unserer IDE öffnen und unsere Begrüßung ergänzen.
+- erstelle neue CSS-Datei unter `static/greeting-styles/`
+  - möglichst Namenskollisionen mit anderen Leuten im Kurs vermeiden, damit es später leichter ist, die Pull Requests ohne Konflikte zu vereinen
+- ergänze Link mit passenden RequestParams für Name und CSS-Datei in der `index.html`
+- erstelle Commit, wenn alles funktioniert
+- mit `git push` wird der branch mit dem neuen Commit gepusht
+- am Beamer geht es weiter.
+
+Schritt 4 führen wir nur aus, um lokal zwei Branches zu mergen.
+Wenn es dabei zu Konflikten kommt, kann ein unter `git mergetool` eingerichtetes Programm helfen, übersichtlich Änderungen manuell zu vereinen.
+
+Stattdessen nutzen wir aber die GUI von Github, um einen Pull Request zu erstellen, den der Repository-Besitzer (oder jemand mit passenden Rechten) auch in der GUI von Github annehmen kann.
 
 
-<!--
+
+## `curl` und verschiedene Rückgabe dank Request-Headers
+
+### Im Webbrowser (zB Firefox)
+
+Die Headers eines HTTP-Requests können dem empfangenden Backend weitere Informationen mitgeben, wie gewünschtes Dateiformat oder Sprache.
+Beispielhaft wollen wir unsere bisherigen zwei Endpunkte mit jeweils HTML- und JSON-Rückgabe abändern, sodass sie unter dem gleichen Pfad erreichbar sind.
+
+<b style="color: pink; background-color: black; padding: 0.1rem;">
+Achtung:
+In unserem Beispiel machen diese zwei Endpunkte ganz verschiedene Dinge. Einer gibt eine Begrüßung zurück, der andere gibt ein Dummy POJO zurück.
+Zwei Endpunkte sollten nur unter dem gleichen Pfad erreichbar sein, wenn sie konzeptionell die gleiche Sache machen und zurückgeben.
+Damit unser Beispielcode schlank und einfach bleibt, ändern wir die JSON-Rückgabe aber nicht ab.
+</b>
+
+Wir öffnen unsere Hauptseite im Firefox Web Browser, öffnen die Dev-Tools (zB mit `F12`), klicken dort auf den **Network**-Tab und klicken dann auf unserer Seite auf den Link zur Begrüßung.
+Im Network-Tab sehen wir, wenn wir den entsprechenden GET-Request anklicken, dass in den Headers `Accept: text/html,[...]` steht.
+
+![1. Screenshot der Dev-Tools mit markierten Stellen, die man anklicken sollte.](images/ff-dev-accept.png "1. Screenshot Klickpfad Dev-Tools")
+
+Mit einem Rechtsklick auf den Request oben und dann Klick auf `Edit and Resend`, können wir die Headers ändern und schreiben bei Accept rein: `application/json` und schicken den Request ab.
+
+![2. Screenshot der Dev-Tools mit markierten Stellen, die man anklicken sollte.](images/ff-dev-new-accept.png "2. Screenshot Klickpfad Dev-Tools")
+
+Als Antwort bekommen wir jetzt den Status-Code `406 Not Acceptable`, denn unser Backend liefert hinter diesem Pfad noch keine JSON.
+Das ändern wir jetzt und probieren das gleiche nochmal.
+
+### Endpunkte mit gleichem Pfad, aber verschiedenen Rückgabetypen
+
+Wenn wir bei unseren beiden bisherigen Endpunkten in der Annotation `@GetMapping("...")` den gleichen String als Pfad übergeben und dann unser Programm starten, stürzt es direkt ab, u.a. mit Fehler 
+`java.lang.IllegalStateException: Ambiguous mapping. Cannot map 'greetingController' method`
+
+Wir müssen die Endpunkte noch nach Rückgabetyp unterscheiden.
+Bei Spring reicht es, in der HTTP-Verb-Annotation die Variable `produces` zu setzen mit dem korrekten Wert für die entsprechenden Rückgabetypen.
+Anstatt standardisierte Strings wie `"text/html"` oder `"application/json"` auswendig zu kennen, können wir hier den Enum `MediaType` verwenden.
+Wir tauschen also `@GetMapping("/greeting")` beim ersten Endpunkt aus durch:
+  ```java
+  @GetMapping(value = "/greeting", produces = MediaType.TEXT_HTML_VALUE)
+  ```
+und beim JSON-Endpunkt schreiben wir:
+  ```java
+  @GetMapping(value = "/greeting", produces = MediaType.APPLICATION_JSON_VALUE)
+  ```
+Ansonsten ändern wir nichts an den Endpunkten.
+
+Jetzt können wir unseren Request mit angepassten Headern erneut in den Dev-Tools von Firefox abschicken und die JSON-Antwort sehen.
+
+
+### Requests mit `curl`
+
+Die beiden GET-Requests können wir folgendermaßen im Terminal mit `curl` ausführen, um uns für spätere POST-Requests aufzuwärmen:
+
+```
+curl localhost:8080
+
+curl localhost:8080/greeting -H "accept: text/html"
+curl localhost:8080/greeting -H "accept: application/json"
+
+curl -H "accept: text/html" localhost:8080/greeting
+curl -H "accept: application/json" localhost:8080/greeting
+
+curl localhost:8080/greeting -H "accept: text/html"
+curl localhost:8080/greeting -H "accept: application/json"
+
+curl 'localhost:8080/greeting?name=Alex&css=style-alex' -H "accept: text/html"
+curl localhost:8080/greeting?name=Paul -H "accept: application/json"
+```
+
+Beim vorletzten `curl`-Befehl sind die String-Delimiter beim Pfad wichtig, da sonst das `&`-Zeichen im Pfad zu Problemen führt.
+
+
+
 ## POST-Requests und HTML-forms
 
 ### POST-Request basteln im Backend
@@ -324,12 +511,11 @@ Praktisch wird es häufig einfach dafür verwendet, bei einem HTTP-Request auch 
 Wir basteln zuerst auch nur einen POST-Request, der keine Daten anlegt.
 Unser erstes Ziel ist es, die Daten im Body richtig zu empfangen und zB über `System.out.println(...)` im Terminal anzuzeigen, oder sie in einer Antwort mit JSON oder Thymeleaf zurückzugeben.
 
-Dafür bereiten wir einen POST-Endpunkt vor, der im Body die Daten enthält, mit denen wir unser vorher verwendeted POJO basteln können.
-Später und später auch persistieren
+Dafür bereiten wir einen POST-Endpunkt vor, der im Body die Daten enthält, mit denen wir unser vorher verwendetes POJO basteln können.
+Später werden wir dann dieses Objekt in einer Datenbank persistieren wollen.
 
-- zuerst ohne wirklich Datensätze anzulegen, sondern wir schicken einen Body mit und schauen, dass der Controller entsprechend antwortet, wenn der Body die richtigen Daten enhält
-  - JSON-Endpunkt, der uns einfach ein JSON mit true oder false zurückgibt, wenn etwas geklappt hat, und vielleicht auch ein paar der mitgeschickten Daten
-    - mit curl Testen, Infos im JSON-Body mitschicken
+- mit curl Testen, Infos im JSON-Body mitschicken
+  - zuerst mit System.out.println(...)
   - jetzt auch mit Thymeleaf als Rückgabe, zuerst mit curl und die HTML-Antwort im Terminal bestaunen, aber nichts weiter damit anfangen
 
 TODO ALEX
