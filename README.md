@@ -80,28 +80,27 @@ Wir starten mit der Grundstruktur, die wir aus dem [Spring initializr](https://s
 
 ### in IntelliJ öffnen und einfachen GET-Endpunkt erstellen
 - in IntelliJ öffnen, am besten direkt die `pom.xml` auswählen
-- erstelle neben der main-Klasse auch einen GreetingController, dort zuerst nicht Code aus Tutorial einfügen
-	- zuerst komplett ohne RequestParam
-      ```java
-      package com.example.simple;
+- erstelle neben der main-Klasse auch eine Klasse `GreetingController.java` als Controller für unsere Endpunkte
+	- zuerst komplett ohne RequestParam, nur mit `Model model` für Thymeleaf
+    ```java
+    package com.example.simple;
 
-      import org.springframework.stereotype.Controller;
-      import org.springframework.ui.Model;
-      import org.springframework.web.bind.annotation.GetMapping;
-      import org.springframework.web.bind.annotation.RequestMapping;
+    import org.springframework.stereotype.Controller;
+    import org.springframework.ui.Model;
+    import org.springframework.web.bind.annotation.GetMapping;
+    import org.springframework.web.bind.annotation.RequestMapping;
 
-      @Controller
-      public class GreetingController {
+    @Controller
+    public class GreetingController {
 
-          @GetMapping("/greeting")
-          public String greeting(Model model) {
-              return "greeting";
-          }
-      }
-      ```
-- erstelle `greeting.html` in `src/main/resources/templates`
-	- Code aus [Spring-Anleitung](https://spring.io/guides/gs/serving-web-content#initial) kopieren, aber hier noch `${name}` rausnehmen (evtl Zeile ersetzen und auskommentieren).
-    - ACHTUNG!: die einzelnen Anführungszeichen um `Hello World!` im folgenden Beispielcode sind wichtig! Durch die doppelten Anführungszeichen wird erst der Input für Thymeleaf ermöglicht, aber dann muss man die einzelnen Anführungszeichen noch als String-Delimiter setzen. Das nicht zu tun, wäre so verwerflich, wie in Java `String text = Hello World!;` ohne String-Delimiter zu schreiben.
+        @GetMapping("/greeting")
+        public String greeting(Model model) {
+            return "greeting";
+        }
+    }
+    ```
+- erstelle `greeting.html` in `src/main/resources/templates`, mit folgenden Code (genommen aus der [Spring-Anleitung](https://spring.io/guides/gs/serving-web-content#initial), aber hier noch `${name}` rausgenommen)
+  - ACHTUNG!: die einzelnen Anführungszeichen um `Hello World!` im folgenden Beispielcode sind wichtig! Durch die doppelten Anführungszeichen wird erst der Input für Thymeleaf ermöglicht, aber dann muss man die einzelnen Anführungszeichen noch als String-Delimiter setzen. Das nicht zu tun, wäre so verwerflich, wie in Java `String text = Hello World!;` ohne String-Delimiter zu schreiben.
     ```html
     <!DOCTYPE HTML>
     <html xmlns:th="http://www.thymeleaf.org">
@@ -114,7 +113,7 @@ Wir starten mit der Grundstruktur, die wir aus dem [Spring initializr](https://s
     </body>
     </html>
     ```
-    - beachte beim Code-Beispiel von der [Spring-Anleitung](https://spring.io/guides/gs/serving-web-content#initial) die Pipe-Zeichen "`|`", durch die man in Spring Strings markiert, in denen man Platzhalter ähnlich wie bei Javascript Strings einsetzen kann. Für diese Anleitung lieber Strings konkatenieren wie in basic Java
+  - beachte beim Code-Beispiel von der [Spring-Anleitung](https://spring.io/guides/gs/serving-web-content#initial) die Pipe-Zeichen "`|`", durch die man in Spring Strings markiert, in denen man Platzhalter ähnlich wie bei Javascript Strings einsetzen kann. Für diese Anleitung lieber Strings konkatenieren wie in basic Java
 
 ### Backend lokal laufen lassen mit maven
 Zum Ausführen des Projekts lernen wir zwei Möglichkeiten:
@@ -203,7 +202,7 @@ Sondern wir geben einfach ein POJO (=*Plain Old Java Object*) zurück und Spring
       return person;
   }
   ```
-  - Achtung: hier auch `model` bei den Eingabeparametern weglassen!
+  - Achtung: hier auch `Model model` bei den Eingabeparametern weglassen, das brauchen wir nur für Thymeleaf!
 
 
 ### Lombok Annotations
@@ -288,8 +287,8 @@ Dafür legen wir eine Datei `index.html` in den Ordner `src/main/resources/stati
   </body>
   </html>
   ```
-  <!-- - wie wir die Unterseite mit Input öffnen können, ohne ihn selbst in die URL zu schreiben, sehen wir in Kürze. TODO ALEX check ob GET mit Form mit Request Params geht!!
-    Zunächst reichen uns diese beiden fest gesetzten Links -->
+  - wie wir die Unterseite mit Input öffnen können, ohne ihn selbst in die URL zu schreiben, sehen wir später im Kapitel zu HTML-Forms.
+    Zunächst reichen uns diese fest gesetzten Links.
 
 
 ## 4) Thymeleaf mit Styling
@@ -351,6 +350,8 @@ Jetzt wollen wir eine weitere CSS-Datei erstellen und diese nutzen, wenn ein pas
   </body>
   </html>
   ```
+    - Schöner wäre es, den default-Wert einfach beim Endpunkt direkt zu behandeln, zB in der Annotation `@RequestParam`, direkt beim Input `defaultValue="boring"`.
+      Wir wollen aber auch mal etwas in Thymeleaf ausprobieren.
 - neue CSS-Datei könnte unter `src/main/resources/static/greeting-styles/style-alex.css` erstellt werden und so aussehen:
   ```css
   p {
@@ -389,12 +390,11 @@ Jetzt wollen wir eine weitere CSS-Datei erstellen und diese nutzen, wenn ein pas
   ```
 
 Die alte, jetzt auskommentierte Zeile `<link rel="stylesheet" th:href="@{/greeting-styles/boring.css}">` in `greeting.html` könnten wir auch drinnen lassen, damit dieses Styling auch dann greift, wenn der in `cssFileName` mitgegebene Wert nicht zu einer existierenden CSS-Datei passt.
-In der ausgewählten CSS-Datei können alle Werte aus `boring.css` überschrieben werden, weil bei CSS neuere Regeln alte überschreiben.
+In der ausgewählten CSS-Datei können alle Werte aus `boring.css` überschrieben werden, weil bei CSS neuere (untere) Regeln die alten (oberen) überschreiben.
 
 
 
-<!--
-## 5) Optionaler Abschweifer: Kollaborativ arbeiten mit git (hier: Github)
+## 5) Optionaler Abschweifer: Kollaborativ arbeiten mit git (mit einem remote Repository, zB bei Github oder Gitlab)
 Gemeinsam erweitern wir unsere Hauptseite um weitere Begrüßungslinks.
 Folgende konzeptionellen Schritte müssen wir dafür durchgehen:
 - wir ziehen uns mit `git clone` den aktuellen Stand vom Dozenten
@@ -428,6 +428,8 @@ Schritt 4 führen wir nur aus, um lokal zwei Branches zu mergen.
 Wenn es dabei zu Konflikten kommt, kann ein unter `git mergetool` eingerichtetes Programm helfen, übersichtlich Änderungen manuell zu vereinen.
 
 Stattdessen nutzen wir aber die GUI von Github, um einen Pull Request zu erstellen, den der Repository-Besitzer (oder jemand mit passenden Rechten) auch in der GUI von Github annehmen kann.
+  - Achtung: bei Github muss man erst als "Collaborator" hinzugefügt werden und hat dann auch Rechte, auf main zu pushen, und das kann wohl nicht eingestellt werden.
+    Bei Gitlab können "Members" mit verschiedenen Berechtigungen hinzugefügt werden.
 
 
 
@@ -444,6 +446,8 @@ In unserem Beispiel machen diese zwei Endpunkte ganz verschiedene Dinge. Einer g
 Zwei Endpunkte sollten nur unter dem gleichen Pfad erreichbar sein, wenn sie konzeptionell die gleiche Sache machen und zurückgeben.
 Damit unser Beispielcode schlank und einfach bleibt, ändern wir die JSON-Rückgabe aber nicht ab.
 </b>
+
+<br>
 
 Wir öffnen unsere Hauptseite im Firefox Web Browser, öffnen die Dev-Tools (zB mit `F12`), klicken dort auf den **Network**-Tab und klicken dann auf unserer Seite auf den Link zur Begrüßung.
 Im Network-Tab sehen wir, wenn wir den entsprechenden GET-Request anklicken, dass in den Headers `Accept: text/html,[...]` steht.
@@ -502,54 +506,164 @@ Beim vorletzten `curl`-Befehl sind die String-Delimiter beim Pfad wichtig, da so
 
 
 
-## 7) POST-Requests und HTML-forms
+## 7) POST-Requests
 
-### POST-Request basteln im Backend
 Laut HTTP ist das POST-Verb dafür gedacht, Datensätze anzulegen.
-Praktisch wird es häufig einfach dafür verwendet, bei einem HTTP-Request auch einen Request Body mitzuschicken -- normalerweise mit einem JSON-Objekt als Datenträger.
+Praktisch wird es häufig einfach dafür verwendet, bei einem HTTP-Request einen Request Body mitschicken zu können -- normalerweise mit einem JSON-Objekt als Datenobjekt.
 
-Wir basteln zuerst auch nur einen POST-Request, der keine Daten anlegt.
-Unser erstes Ziel ist es, die Daten im Body richtig zu empfangen und zB über `System.out.println(...)` im Terminal anzuzeigen, oder sie in einer Antwort mit JSON oder Thymeleaf zurückzugeben.
+Wir basteln zuerst nur einen POST-Request, der keine Daten anlegt.
+Unser erstes Ziel ist es, die Daten im Body richtig zu empfangen.
+Um zu sehen, ob wir sie passend empfangen, können wir sie zB über `System.out.println(...)` im Terminal anzeigen, oder sie in einer Antwort mit JSON oder Thymeleaf zurückgeben.
 
 Dafür bereiten wir einen POST-Endpunkt vor, der im Body die Daten enthält, mit denen wir unser vorher verwendetes POJO basteln können.
 Später werden wir dann dieses Objekt in einer Datenbank persistieren wollen.
 
+Dafür brauchen wir nur statt `@GetMapping` ein `@PostMapping` und außerdem noch bei den Eingabeparametern die Annotation `@RequestBody`, die uns automatisch den JSON-Body des Requests zu unserem Java Objekt umwandelt.
+
+- wir erweitern zunächst unser POJO um ein paar weitere Felder
+  ```java
+  import lombok.*;
+
+  @Getter
+  @Setter
+  @Builder
+  public class Person {
+      private Long id;
+      private String name;
+      private String email;
+      private Integer age;
+      private Boolean married;
+  }
+  ```
+- POST-Endpunkt basteln
+  ```java
+  @PostMapping(value = "/person")
+  @ResponseBody
+  public Person createPersonFromJson(@RequestBody Person person) {
+      // hier sollten wir die Person speichern, aber wir haben noch keine Datenbank
+      System.out.println(person.getId());
+      System.out.println(person.getName());
+      System.out.println(person.getEmail());
+      System.out.println(person.getAge());
+      System.out.println(person.getMarried());
+
+      // wir geben die Person als JSON zurück
+      return person;
+  }
+  ```
 - mit curl Testen, Infos im JSON-Body mitschicken
-  - zuerst mit System.out.println(...)
-  - jetzt auch mit Thymeleaf als Rückgabe, zuerst mit curl und die HTML-Antwort im Terminal bestaunen, aber nichts weiter damit anfangen
-
-TODO ALEX
-
-### POST-Request mit HTML-Form
-Die Daten, die wir im Body mitschicken, wollen aus einer Eingabe vom User nehmen.
-
-Beachte, dass wir Strings theoretisch auch als Request-Params bei einem GET-Request schicken könnten.
-Diese sind für Einstellungen/Optionen gedacht, und nicht für zu speichernde Informationen.
-Entsprechend gibt es bei HTML auch keine einfache Möglichkeit (ohne JavaScript) Request-Params mitzuschicken.
-Wir können aber einen Request-Body mitschicken.
-
-#### ohne Thymeleaf, nur HTML
-Wir basteln eine HTML-Form mit ein paar Textfeldern, die wir dann per POST-Request an unseren Endpunkt schicken.
-
-TODO ALEX
-
-
-#### mit Thymeleaf
-Jetzt basteln wir wieder eine HTML-Form, aber direkt mit Thymeleaf. Wir wollen den gleichen POST-Rquest abschicken, wie direkt davor ohne Thymeleaf.
-
-TODO ALEX, dabei auch Vorteile im Vergleich zu normalen HTML-Forms herausstellen!
+  ```
+  curl -H 'Content-Type: application/json' \
+    -d '{ "name":"Andi", "email":"andi@example.com", "age":"28", "married": true}' \
+    -X POST \
+    localhost:8080/person
+  ```
 
 
 
-## 8) Antworten mit eigenen HTTP-Status-Codes
+## 8) HTML-Form für GET- und POST-Requests
+Die Daten, die wir mit einem Request mitschicken, wollen wir aus einer Eingabe vom User nehmen.
 
-TODO ALEX
-- und evtl weiteren Informationen im HTTP-Header
+#### Ohne Thymeleaf, nur HTML
+Da es bei einem GET-Request keinen Body gibt, werden die Eingaben als Key-Value-Pairs (oder hier treffender: Name-Value-Pairs) in die Request-Parameter hinter den Pfad gehängt.
+
+Fügen wir die folgende HTML-Form in unsere `index.html` ein, dann kann der User den anzuzeigenden Namen eintippen und die anzuzeigende CSS auswählen.
+Beim `<form>`-Tag sind die Attribute `action` für den Pfad und `method` für das HTTP-Verb (bzw die HTTP-Methode) wichtig.
+
+Achtung: im folgenden Code sind CSS-Dateinamen enthalten, die bei Anfertigung der Anleitung von Umschülern erstellt wurden, nicht hier im Beispiel.
+Probiere es aus und schaue nach, wie nach Abschicken des Formulars der Request in der URL-Leiste deines Browsers (oder in den Dev-Tools) aussieht.
+```html
+<h2>Begrüßungs-Generator</h2>
+<form action="/greeting" method="GET">
+  <div>
+    <label for="userInput">Dein Name?</label>
+    <input name="n" id="userInput" placeholder="Gib deinen Namen ein" />
+  </div>
+  <div>
+    <label for="styling">Styling?</label>
+    <select name="css" id="styling">
+      <option value="" selected>Standard</option>
+      <option value="style-mathias">Mathias</option>
+      <option value="style-stefan">Stefan</option>
+      <option value="style-max">Max</option>
+      <option value="style-jasmin">Jasmin</option>
+      <option value="style-alex">Alex</option>
+      <option value="a">Leer</option>
+    </select> 
+  </div>
+  <div>
+    <button>Hallo?</button>
+  </div>
+</form>
+```
+
+Für einen POST-Request müssen wir das Attribut `method` anpassen.
+Und in unserem Fall auch den Pfad, da wir unter `/greeting` keinen POST-Request haben.
+
+Beim POST-Request werden die Inputs leider nicht direkt als JSON-Objekt im Body mitgesendet, sondern wie beim GET-Request eigentlich in der URL.
+Die Annotation `@RequestBody` brauchen wir deswegen nicht mehr.
+Spring wandelt die Daten in der URL dann ohne Annotation zu unserem POJO um.
+
+Ähnlich wie bei den beiden GET-Requests mit dem gleichen Pfad, können wir auch hier wieder den gleichen Pfad nutzen.
+Dann müssen wir aber in der Annotation `@PostMapping` den Wert `consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE` setzen.
+
+```java
+@PostMapping(value = "/person", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+public String createPersonFromForm(Person person) {
+    // hier sollten wir die Person speichern, aber wir haben noch keine Datenbank
+    System.out.println(person.getId());
+    System.out.println(person.getName());
+    System.out.println(person.getEmail());
+    System.out.println(person.getAge());
+    System.out.println(person.getMarried());
+
+    // wir leiten den User als Antwort einfach auf die Hauptseite zurück
+    return "redirect:/";
+
+    // stattdessen könnten wir den Namen der Person auch mit model.addAttribute("inputName", person.name()); für Thymeleaf bereitstellen und dann unser greeting.html Template zurückgeben
+}
+```
+```html
+<h2>Person speichern</h2>
+<p>
+  Neuerdings kann man auf dieser Webseite auch Personen speichern. Wow! Fülle dafür das folgende Formular aus und schicke es mit dem Absenden-Button ab.
+</p>
+<form action="/person" method="POST">
+  <div>
+    <label for="name">Name</label>
+    <input name="name" id="name" type="text" placeholder="Gib deinen Namen ein" />
+  </div>
+  <div>
+    <label for="email">E-Mail-Adresse</label>
+    <input name="email" id="email" type="email" placeholder="und deine E-Mail" />
+  </div>
+  <div>
+    <label for="age">Alter</label>
+    <input name="age" id="age" type="number" value="25" />
+  </div>
+  <div>
+    <input name="married" id="married" type="checkbox" />
+    <label for="married">Verheiratet?</label>
+  </div>
+  <div>
+    <button>Absenden</button>
+  </div>
+</form>
+```
+
+
+#### Mit Thymeleaf
+
+Hier ist der Link zur Dokumentation von Thymeleaf bezüglich Forms: https://www.thymeleaf.org/doc/tutorials/2.1/thymeleafspring.html#creating-a-form
+
 
 
 
 ## 9) Daten speichern in einer Datenbank
 
+***TODO ALEX: dieses Kapitel ist noch nicht fertig***
+
+<!--
 TODO ALEX: evtl In-Memory bereits for POST-Requests, sodass wir bei den POSTs Daten speichern und zurückgeben können. Dann an dieser Stelle persistieren in File?
 
 Unsere Daten wollen wir jetzt auch mal abspeichern, sodass sie nach einem Request noch verfügbar sind.
@@ -649,17 +763,13 @@ CREATE TABLE journal_entry (
 INSERT INTO journal_entry VALUES (1, 'Start', 'es geht los', 'So fing alles an. Was ist schon lange her, dass ...');
 INSERT INTO journal_entry VALUES (2, 'Abend', 'hammer', 'Was ein Tag es war, was ich alles gelernt habe ...');
 ```
-
+-->
 
 ## 10) User-Authentication und Rollen / Berechtigungen
 
-TODO ALEX
+Ein guter Link von der offiziellen Spring Seite zum mal drüberlesen: https://spring.io/guides/gs/securing-web
+
+Ein sehr vielversprechend aussehender Link zum wirklich umsetzen: https://www.geeksforgeeks.org/spring-security-tutorial/
 
 
-************
-
-## TODO ALEX Ideen:
-- Datenbank initialisieren:
-  - In-Memory zuerst in 
-- Entity in Java als Objekt anlegen, außerdem Repository (ohne Service), per Controller zurückgeben (siehe Projekt)
 
