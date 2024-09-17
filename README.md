@@ -273,7 +273,7 @@ In folgender Hauptseite (`static/index.html`) zeigen wir unsere bisherigen Links
 Dafür legen wir eine Datei `index.html` in den Ordner `src/main/resources/static`:
   ```html
   <!DOCTYPE HTML>
-  <html>
+  <html lang="de">
   <head>
     <title>Meine Seite</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -288,11 +288,11 @@ Dafür legen wir eine Datei `index.html` in den Ordner `src/main/resources/stati
   </body>
   </html>
   ```
-  - wie wir die Unterseite mit Input öffnen können, ohne ihn selbst in die URL zu schreiben, sehen wir in Kürze. TODO ALEX check ob GET mit Form mit Request Params geht!!
+  <!-- - wie wir die Unterseite mit Input öffnen können, ohne ihn selbst in die URL zu schreiben, sehen wir in Kürze. TODO ALEX check ob GET mit Form mit Request Params geht!!
     Zunächst reichen uns diese beiden fest gesetzten Links -->
 
 
-## Thymeleaf mit Styling
+## 4) Thymeleaf mit Styling
 
 Wie auch in HTML-Dateien, können wir oben im `<head>`-Tag Thymeleaf-Template eine CSS-Datei mithilfe des HTML-Tags `<link>` einbinden.
 Damit das Backend, auch wenn es gebaut ist und auf irgendeinem Server läuft, noch den Pfad zur Datei findet, nutzen wir Thymeleafs URL-Syntax.
@@ -394,7 +394,7 @@ In der ausgewählten CSS-Datei können alle Werte aus `boring.css` überschriebe
 
 
 <!--
-## Optionaler Abschweifer: Kollaborativ arbeiten mit git (hier: Github)
+## 5) Optionaler Abschweifer: Kollaborativ arbeiten mit git (hier: Github)
 Gemeinsam erweitern wir unsere Hauptseite um weitere Begrüßungslinks.
 Folgende konzeptionellen Schritte müssen wir dafür durchgehen:
 - wir ziehen uns mit `git clone` den aktuellen Stand vom Dozenten
@@ -431,7 +431,7 @@ Stattdessen nutzen wir aber die GUI von Github, um einen Pull Request zu erstell
 
 
 
-## `curl` und verschiedene Rückgabe dank Request-Headers
+## 6) `curl` und verschiedene Rückgabe dank Request-Headers
 
 ### Im Webbrowser (zB Firefox)
 
@@ -478,7 +478,7 @@ Ansonsten ändern wir nichts an den Endpunkten.
 Jetzt können wir unseren Request mit angepassten Headern erneut in den Dev-Tools von Firefox abschicken und die JSON-Antwort sehen.
 
 
-### Requests mit `curl`
+### Requests abschicken mit `curl`
 
 Die beiden GET-Requests können wir folgendermaßen im Terminal mit `curl` ausführen, um uns für spätere POST-Requests aufzuwärmen:
 
@@ -502,7 +502,7 @@ Beim vorletzten `curl`-Befehl sind die String-Delimiter beim Pfad wichtig, da so
 
 
 
-## POST-Requests und HTML-forms
+## 7) POST-Requests und HTML-forms
 
 ### POST-Request basteln im Backend
 Laut HTTP ist das POST-Verb dafür gedacht, Datensätze anzulegen.
@@ -541,8 +541,17 @@ TODO ALEX, dabei auch Vorteile im Vergleich zu normalen HTML-Forms herausstellen
 
 
 
+## 8) Antworten mit eigenen HTTP-Status-Codes
 
-## Daten speichern in einer Datenbank
+TODO ALEX
+- und evtl weiteren Informationen im HTTP-Header
+
+
+
+## 9) Daten speichern in einer Datenbank
+
+TODO ALEX: evtl In-Memory bereits for POST-Requests, sodass wir bei den POSTs Daten speichern und zurückgeben können. Dann an dieser Stelle persistieren in File?
+
 Unsere Daten wollen wir jetzt auch mal abspeichern, sodass sie nach einem Request noch verfügbar sind.
 
 Es gibt viele Lösungen für Datenbanken, die man anbinden kann.
@@ -642,16 +651,15 @@ INSERT INTO journal_entry VALUES (2, 'Abend', 'hammer', 'Was ein Tag es war, was
 ```
 
 
+## 10) User-Authentication und Rollen / Berechtigungen
+
+TODO ALEX
+
+
 ************
 
 ## TODO ALEX Ideen:
-- CHECKEN: Endpunkt gleicher Pfad aber durch Request-Header (wie stellen; wie verarbeiten bei Annahme?) kriegen wir JSON oder HTML zurück
-- Endpunktantwort: mit selbst gesetztem HTTP-Status-Code
-  - und evtl weiteren Informationen im HTTP-Header
 - Datenbank initialisieren:
   - In-Memory zuerst in 
 - Entity in Java als Objekt anlegen, außerdem Repository (ohne Service), per Controller zurückgeben (siehe Projekt)
-
-- am Ende noch User-Authentication und Rollen einbauen???
--->
 
