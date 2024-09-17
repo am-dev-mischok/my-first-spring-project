@@ -3,9 +3,7 @@ package com.academy.my_first_spring_project;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +33,20 @@ public class GreetingController {
         // zB stattdessen so eine Business-Logik, die mir eine Person mit Id 7 aus der Datenbank holt:
 //        Person person = personRepository.findById(7);
 
+        return person;
+    }
+
+    @PostMapping(value = "/person")
+    @ResponseBody
+    public Person createPersonFromJson(@RequestBody Person person) {
+        // hier sollten wir die Person speichern, aber wir haben noch keine Datenbank
+        System.out.println(person.getId());
+        System.out.println(person.getName());
+        System.out.println(person.getEmail());
+        System.out.println(person.getAge());
+        System.out.println(person.getMarried());
+
+        // wir geben die Person als JSON zurück
         return person;
     }
 }
