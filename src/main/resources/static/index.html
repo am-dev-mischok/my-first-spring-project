@@ -20,5 +20,28 @@
   <p>
     Wer ist <a href="/greeting?n=Jasmin&css=style-jasmin">Jasmin?</a>.
   </p>
+
+  <h2>Begrüßungs-Generator</h2>
+  <form action="/greeting" method="GET">
+    <div>
+      <label for="userInput">Dein Name?</label>
+      <input name="n" id="userInput" placeholder="Gib deinen Namen ein" />
+    </div>
+    <div>
+      <label for="styling">Styling?</label>
+      <select name="css" id="styling">
+        <option value="" selected>Standard</option>
+        <option value="style-mathias">Mathias</option>
+        <option value="style-stefan">Stefan</option>
+        <option value="style-max">Max</option>
+        <option value="style-jasmin">Jasmin</option>
+        <option value="style-alex">Alex</option>
+        <option value="a">Leer</option>
+      </select>
+    </div>
+    <div>
+      <button>Hallo?</button>
+    </div>
+  </form>
 </body>
 </html>
