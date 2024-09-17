@@ -1,5 +1,6 @@
 package com.academy.my_first_spring_project;
 
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,7 +13,7 @@ import java.util.List;
 @Controller
 public class GreetingController {
 
-    @GetMapping("/greeting")
+    @GetMapping(value = "/greeting", produces = MediaType.TEXT_HTML_VALUE)
     public String greeting(
             @RequestParam(name="n", required = false, defaultValue = "Welt") String someName,
             @RequestParam(name="css", required = false, defaultValue = "") String cssString,
@@ -23,7 +24,7 @@ public class GreetingController {
         return "greeting";
     }
 
-    @GetMapping("/person")
+    @GetMapping(value = "/greeting", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public Person personJson() {
         // Objekt erstellen, zB aus Datenbank holen, sonstige Business-Logik
