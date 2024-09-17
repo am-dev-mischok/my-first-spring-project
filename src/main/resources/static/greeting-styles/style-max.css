@@ -1,0 +1,27 @@
+p {
+    color: darkcyan;
+    background-color: white;
+    padding: 0.5rem 4rem;
+
+    transition: background-color 0.5s, scale 0.5s, rotate 1s;
+
+    font-weight: bold;
+    font-family: Arial;
+    font-size: 5rem;
+}
+p:hover {
+    background-color: black;
+    scale: -1.2 1.2;
+    rotate: 4deg;
+}
+
+body {
+    background-color: darkcyan;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    height: 100vh;
+    width: 100vw;
+}
