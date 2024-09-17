@@ -554,7 +554,7 @@ Dafür brauchen wir nur statt `@GetMapping` ein `@PostMapping` und außerdem noc
 - mit curl Testen, Infos im JSON-Body mitschicken
   ```
   curl -H 'Content-Type: application/json' \
-    -d '{ "name":"Andi", "email":"andi@example.com", "age":"28", "married": true}' \
+    -d '{ "name":"Paul", "email":"paul@example.com", "age":"25", "married": true}' \
     -X POST \
     localhost:8080/person
   ```
@@ -649,6 +649,14 @@ public String createPersonFromForm(Person person) {
     <button>Absenden</button>
   </div>
 </form>
+```
+
+Den POST-Request, der von der Form abgeschickt wird, können wir folgendermaßen mit `curl` abschicken:
+```
+curl -X POST \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -d 'name=Paul&email=paul%40example.com&age=25&married=on' \
+  localhost:8080/person
 ```
 
 
