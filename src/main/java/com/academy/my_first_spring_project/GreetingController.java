@@ -15,9 +15,11 @@ public class GreetingController {
     @GetMapping("/greeting")
     public String greeting(
             @RequestParam(name="n", required = false, defaultValue = "Welt") String someName,
+            @RequestParam(name="css", required = false, defaultValue = "") String cssString,
             Model model
     ) {
         model.addAttribute("inputName", someName);
+        model.addAttribute("cssFileName", cssString);
         return "greeting";
     }
 
