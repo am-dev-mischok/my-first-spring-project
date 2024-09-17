@@ -43,5 +43,31 @@
       <button>Hallo?</button>
     </div>
   </form>
+
+  <h2>Person speichern</h2>
+  <p>
+    Neuerdings kann man auf dieser Webseite auch Personen speichern. Wow! Fülle dafür das folgende Formular aus und schicke es mit dem Absenden-Button ab.
+  </p>
+  <form action="/person" method="POST">
+    <div>
+      <label for="name">Name</label>
+      <input name="name" id="name" type="text" placeholder="Gib deinen Namen ein" />
+    </div>
+    <div>
+      <label for="email">E-Mail-Adresse</label>
+      <input name="email" id="email" type="email" placeholder="und deine E-Mail" />
+    </div>
+    <div>
+      <label for="age">Alter</label>
+      <input name="age" id="age" type="number" value="25" />
+    </div>
+    <div>
+      <input name="married" id="married" type="checkbox" />
+      <label for="married">Verheiratet?</label>
+    </div>
+    <div>
+      <button>Absenden</button>
+    </div>
+  </form>
 </body>
 </html>

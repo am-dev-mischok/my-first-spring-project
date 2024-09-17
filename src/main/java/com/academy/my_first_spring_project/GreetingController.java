@@ -49,4 +49,19 @@ public class GreetingController {
         // wir geben die Person als JSON zurück
         return person;
     }
+
+    @PostMapping(value = "/person", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public String createPersonFromForm(Person person) {
+        // hier sollten wir die Person speichern, aber wir haben noch keine Datenbank
+        System.out.println(person.getId());
+        System.out.println(person.getName());
+        System.out.println(person.getEmail());
+        System.out.println(person.getAge());
+        System.out.println(person.getMarried());
+
+        // wir leiten den User als Antwort einfach auf die Hauptseite zurück
+        return "redirect:/";
+
+        // stattdessen könnten wir den Namen der Person auch mit model.addAttribute("inputName", person.name()); für Thymeleaf bereitstellen und dann unser greeting.html Template zurückgeben
+    }
 }
