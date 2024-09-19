@@ -1,23 +1,47 @@
-# my-first-spring-project
-Erstellt zusammen mit Umschülern in der Mischok Academy, Modul Software-Architektur 1. Hierunter eine vorab pro Session vorbereitete Anleitung, die wir über mehrere Sitzungen befolgt haben.
+# My first Spring Backend (+Thymeleaf Frontend, auch mit JSON als Antwort)
 
-# My first Spring Backend (+Thymeleaf Frontend)
+Das hier ist eine Schritt-für-Schritt-Anleitung für die Erstellung eines ersten [Spring](https://spring.io/) Backends.
+Entstanden im Rahmen vom Modul "Software-Architektur 1" in der Mischok Academy.
 
-Das hier ist eine Schritt-für-Schritt-Anleitung für die Erstellung eines ersten [Spring](https://spring.io/) Backends. Entstanden im Rahmen vom Modul "Software-Architektur 1" in der Mischok Academy.
 
-## 0) Was wir bauen
-Eine funktionierende, kleine ***Spring***-Anwendung, mit folgenden Funktionalitäten
+## 0) Einleitung
+
+### 0.a) Für Dozierende und Wiederholungstäter
+Der YouTuber *Amigoscode* gibt es ein ganz nettes, fixes, nur 97-minütiges Video [Spring Boot Tutorial | Full Course [2023] [NEW]](https://www.youtube.com/watch?v=9SGDpanrc8U), in dem er mit nur wenigen Unterschieden zur Vorgehensweise aus der folgenden Anleitung die Basics erklärt.
+Wer schon die Grundlagen von Spring mal gesehen hat, ist dort gut aufgehoben.
+Im Video werden aber weniger Sachen behandelt, als in dieser Anleitung.
+Das hier sind alle Unterschiede, die ich beim ersten Erstellen der Anleitung (Alex, September 2024) beim schnellen Anschauen gesehen habe:
+- benutzt nicht ***Lombok***, aber erwähnt es
+- benutzt nicht ***Flyway***
+- Datenbank mit ***Postgres***, nicht mit ***H2***
+  - erstellt in Postgres CLI eine Datenbank, gibt dann dem eigenen User alle Rechte, dessen Authentication er in die application.properties legt?? (vor 40:00)
+- benutzt **kein Thymeleaf**, als Rückgabe **nur JSON**
+  - Controller-Klasse mit `@RestController`, statt `@Controller`, sodass man sich bei JSON-Rückgabe bei den Endpunkten die Annotation `@ResponseBody` sparen kann (wird bei Thymeleaf-Rückgabe evtl stören)
+  - am Anfang schreibt er einen GET-Endpunkt mit den nötigen Annotations direkt bei der Klasse mit `main` rein, lagert das aber später in eigene Klasse aus
+  - benutzt `@RequestMapping` bei Controllerklasse, um allen den gleichen Pfad zu geben
+- **Ordnerstruktur**: für jede Entity eigenen Ordner mit den Klassen, statt einen Ordner mit allen Controllern, einen mit allen Services etc
+- erwähnt Annotation `@Transient` bei Entity-Klasse, um das Feld wegzulassen bei der Persistierung durch JPA
+- nutzt `@Transactional`, um eine Entity mit `.setName(...)` zu updaten
+  - benutzt dabei aber PUT, statt PATCH, obwohl er nur einzelne Sachen mitgibt und aktualisiert, statt der ganzen Entity
+
+
+### 0.b) Was wir bauen
+Eine funktionierende, kleine ***Spring***-Anwendung.
+Ausgangspunkt ist ein ausführliches [Spring Tutorial zu "*Serving Web Content with Spring MVC*"](https://spring.io/guides/gs/serving-web-content), falls man es selbst mal durchlesen möchte (lückenhaft und teilweise nicht so gut).
+In unserer Anleitung gehen wir darüber hinaus und nutzen u.a. Annotations von **Lombok**, bekommen auch **JSON** als Antwort von unseren Endpunkten, verschicken **POST-Requests** und binden eine **H2-Datenbank** ein.
+
+Folgende Funktionalitäten werden wir haben:
 - Dependencies verwalten mit ***Maven*** in einer `pom.xml`
-- **GET**- und **POST-Requests** annehmen
+- **GET**- und **POST-Requests** annehmen, Ausblick auch auf **PUT** und **DELETE**
   - Anfrage
     - GET zuerst nur mit der URL-Zeile vom Browser
     - für POST dann mit `curl` aus dem Terminal
-    - später alles über klickbare Links und **Formulare** im HTML-Frontend
+    - später alles über klickbare Links und **Formulare** (HTML oder Thymeleaf, `<form>`-Tag)
   - Antwort
     - mit ***Thymeleaf*** direkt eine HTML-Seite als renderbares Frontend
     - oder einfach Daten als **JSON**
-    - später auch mit selbst gesetztem *HTTP-Status-Code* und weiteren Informationen im *HTTP-Header*
-- mit Code-Generator ***Lombok*** sparen wir uns Boilerplate-Code und lernen *Annotations* kennen, die nicht zu Spring gehören
+      - später auch mit selbst gesetztem *HTTP-Status-Code* und weiteren Informationen im *HTTP-Header* TODO ALEX
+- mit Code-Generator ***Lombok*** sparen wir uns Boilerplate-Code und lernen **Annotations** kennen
 - ganz normale HTML-Seiten anzeigen
 - Datenbank zum Speichern von Daten
   - wir nutzen ***H2***, zuerst *In-Memory*, dann auch persistiert lokal als Datei
@@ -25,27 +49,29 @@ Eine funktionierende, kleine ***Spring***-Anwendung, mit folgenden Funktionalit�
   - *Datenbank-Migrations* mit ***Flyway***, um initiale Queries und andere Datenbankänderungen reproduzierbar und automatisiert durchzuführen
 - *Automatisierte Tests* (Coming Soon, im Modul Software-Architektur 2)
 
-## 1) Voraussetzungen
+
+### 0.c) Voraussetzungen
 - Vorwissen:
   - **Java** Grundlagen
-  - **Terminal** in einem Ordner öffnen und keine Angst davor haben
-  - optional: **git** installiert und Grundlagen dafür gelernt, um nach jedem Schritt (oder nach wenigen Schritten) einen schönen neuen Commit anzulegen
-- Betriebssystem: **Ubuntu** wäre gut
+  - **HTML** und **CSS** Grundlagen
+  - ***Terminal*** in einem Ordner öffnen und keine Angst davor haben
+  - optional: ***git*** installiert und Grundlagen dafür gelernt, um nach jedem Schritt (oder nach wenigen Schritten) einen schönen neuen Commit anzulegen
+- Betriebssystem: ***Ubuntu*** wäre gut
 - im Terminal installierte/verfügbare Programme:
   - **mvn**
   - **curl**
-- IntelliJ oder anderer Editor / IDE
-  - mit Java **17** oder höher
+- ***IntelliJ*** oder anderer Editor / IDE
+  - mit Java ***17*** oder höher
 
 
-## 2) Start und ein erster Endpunkt
 
-### Leeres Spring Projekt mit passenden Dependencies starten
+## 1) Start und ein erster Endpunkt
 
-Ausgangspunkt ist ein ausführliches [Spring Tutorial zu "*Serving Web Content with Spring MVC*"](https://spring.io/guides/gs/serving-web-content), falls man es selbst mal durchlesen möchte (lückenhaft und teilweise nicht so gut). In unserer Anleitung gehen wir darüber hinaus und nutzen u.a. Annotations von **Lombok**, bekommen auch **JSON** als Antwort von unseren Endpunkten, verschicken **POST-Requests** und binden eine **H2-Datenbank** ein.
+### 1.a) Leeres Spring Projekt mit passenden Dependencies erstellen
 
 Wir starten mit der Grundstruktur, die wir aus dem [Spring initializr](https://start.spring.io/) herausbekommen.
-- entweder die Vorauswahl in [diesem pre-initialized project](https://start.spring.io/#!type=maven-project&language=java&packaging=jar&jvmVersion=11&groupId=com.example&artifactId=serving-web-content&name=serving-web-content&description=Demo%20project%20for%20Spring%20Boot&packageName=com.example.serving-web-content&dependencies=web,thymeleaf,devtools) herunterladen
+![Screenshot vom Initializr mit ausgewählten Sachen](images/initializr.png "Screenshot vom Initializr mit ausgewählten Sachen")
+- entweder die Vorauswahl in [diesem pre-initialized project](https://start.spring.io/#!type=maven-project&language=java&packaging=jar&jvmVersion=17&groupId=com.example&artifactId=my_first_spring_project&name=my_first_spring_project&description=Spring-Projekt%20mit%20grundlegenden%20Funktionen&packageName=com.example.my_first_spring_project&dependencies=web,thymeleaf,devtools) nehmen, Textfelder ausfüllen und mit Klick auf den Button "GENERATE" herunterladen
 - oder selbst im [Spring initializr](https://start.spring.io/) mit Auswahl:
   - Maven als Buildtool
   - Textfelder passend ausfüllen
@@ -77,8 +103,13 @@ Wir starten mit der Grundstruktur, die wir aus dem [Spring initializr](https://s
   </dependency>
   ```
 - dieses Startprojekt am besten direkt auch mit Hilfe von **git** versionieren, optional auch remote auf GitLab oder GitHub, und im Laufe der Anleitung passende Commits erstellen.
+  Mit git kannst du deine Fortschritte sauber und nachhaltig festhalten und mit anderen Teilen.
+  Das hat keinen direkten Einfluss auf deinen fertigen Code.
+  Wenn du git noch nicht kennst, kannst du also auch ohne git weiter machen.
+  Im Anhang, ganz am Ende der Anleitung, findest du einen minimalen Refresher zu git.
 
-### in IntelliJ öffnen und einfachen GET-Endpunkt erstellen
+
+### 1.b) in IntelliJ öffnen und einfachen GET-Endpunkt erstellen
 - in IntelliJ öffnen, am besten direkt die `pom.xml` auswählen
 - erstelle neben der main-Klasse auch eine Klasse `GreetingController.java` als Controller für unsere Endpunkte
 	- zuerst komplett ohne RequestParam, nur mit `Model model` für Thymeleaf
@@ -100,7 +131,9 @@ Wir starten mit der Grundstruktur, die wir aus dem [Spring initializr](https://s
     }
     ```
 - erstelle `greeting.html` in `src/main/resources/templates`, mit folgenden Code (genommen aus der [Spring-Anleitung](https://spring.io/guides/gs/serving-web-content#initial), aber hier noch `${name}` rausgenommen)
-  - ACHTUNG!: die einzelnen Anführungszeichen um `Hello World!` im folgenden Beispielcode sind wichtig! Durch die doppelten Anführungszeichen wird erst der Input für Thymeleaf ermöglicht, aber dann muss man die einzelnen Anführungszeichen noch als String-Delimiter setzen. Das nicht zu tun, wäre so verwerflich, wie in Java `String text = Hello World!;` ohne String-Delimiter zu schreiben.
+  - ACHTUNG!: die einzelnen Anführungszeichen um `Hello World!` im folgenden Beispielcode sind wichtig!
+    Durch die doppelten Anführungszeichen wird erst der Input für Thymeleaf ermöglicht, aber dann muss man die einzelnen Anführungszeichen noch als String-Delimiter setzen.
+    Das nicht zu tun, wäre so falsch, wie in Java `String text = Hello World!;` ohne String-Delimiter zu schreiben.
     ```html
     <!DOCTYPE HTML>
     <html xmlns:th="http://www.thymeleaf.org">
@@ -113,9 +146,9 @@ Wir starten mit der Grundstruktur, die wir aus dem [Spring initializr](https://s
     </body>
     </html>
     ```
-  - beachte beim Code-Beispiel von der [Spring-Anleitung](https://spring.io/guides/gs/serving-web-content#initial) die Pipe-Zeichen "`|`", durch die man in Spring Strings markiert, in denen man Platzhalter ähnlich wie bei Javascript Strings einsetzen kann. Für diese Anleitung lieber Strings konkatenieren wie in basic Java
 
-### Backend lokal laufen lassen mit maven
+
+### 1.c) Backend lokal laufen lassen mit maven
 Zum Ausführen des Projekts lernen wir zwei Möglichkeiten:
 - in einer IDE: bei IntelliJ auf Play drücken, oder vorher Rechtsklick auf die `pom.xml` und dort "Ausführen" (mit grünem Play-Symbol daneben) oder sowas anklicken, oder auf die Java-Klasse mit der main Rechtsklick und "Ausführen". Nach dem ersten erfolgreichen Run sollte bei IntelliJ oben rechts ein grüner Play-Button verfügbar sein.
 - ohne IntelliJ oder sonstige IDE: Terminal öffnen im Projektordner und ausführen:
@@ -154,13 +187,19 @@ Jetzt ändern wir den Inhalt im Thymeleaf-Template durch einen Request-Parameter
     ```html
     <p th:text="'Hello ' + ${inputName} + '!'"></p>
     ```
+    - im Code-Beispiel von der [Spring-Anleitung](https://spring.io/guides/gs/serving-web-content#initial) steht es ein bisschen anders dran, mit dem gleichen Ergebnis.
+      Hier werden Pipe-Zeichen "`|`" verwendet, durch die man in Spring Strings markiert, in denen man Platzhalter ähnlich wie bei Strings in JavaScript oder bei Pythons f-Strings einsetzen kann.
+      D.h. wir können den String mit Pipe-Zeichen umschließen, statt mit einfachen Anführungszeichen, und dann einfach im Textfluss Thymeleaf-Variablen einsetzen:
+      ```html
+      <p th:text="|Hello ${inputName}!|"></p>
+      ```
 - beachte, dass man die ganzen Bezeichnungen hierüber (`someName`, `n`, `inputName`) auch alle gleich benennen könnte, zB "name".
   Die sind hier nur verschieden, um klar zu machen, welcher Name was tut.
 
-## 3) JSON als Antwort, Lombok und statische Seiten
 
-### JSON als Antwort vom Endpunkt
-Als nächstes wollen wir vom Endpunkt aus json zurückgeben.
+
+## 2) JSON als Antwort vom Endpunkt
+Als nächstes wollen wir vom Endpunkt aus JSON zurückgeben.
 Dafür nicht mehr mit Thymeleaf und mit dem model und String-Rückgabe beim Endpunkt.
 Sondern wir geben einfach ein POJO (=*Plain Old Java Object*) zurück und Spring-Web konvertiert das mit Jackson für uns direkt zu einem JSON-Objekt.
 
@@ -205,9 +244,10 @@ Sondern wir geben einfach ein POJO (=*Plain Old Java Object*) zurück und Spring
   - Achtung: hier auch `Model model` bei den Eingabeparametern weglassen, das brauchen wir nur für Thymeleaf!
 
 
-### Lombok Annotations
+
+### 3) Lombok Annotations
 Wir löschen in unserem POJO die Getter und Setter und nutzen stattdessen die passenden Annotations von Lombok.
-Mehr Infos [bei Baeldung](https://www.baeldung.com/intro-to-project-lombok).
+Tiefergehende Infos [bei Baeldung](https://www.baeldung.com/intro-to-project-lombok).
 - So aktivieren wir Lombok in IntelliJ:
   - Dependency in die `pom.xml` packen.
     Am besten recherchieren wir dafür alle selbst, wie wir die Dependency kriegen.
@@ -235,8 +275,10 @@ Mehr Infos [bei Baeldung](https://www.baeldung.com/intro-to-project-lombok).
       private String name;
   }
   ```
-- optional: `@Builder`-Annotation einsetzen, um unser POJO im Stile des dem Builder-Patterns zu erzeugen, statt mit Konstruktoren und hinterher gesetzten Werten zu arbeiten.
-  - Vorsicht bei Lombok: Die `@Builder`-Annotation macht den leeren Konstrktur kaputt macht bei der POJO, d.h. wenn man den braucht, braucht man noch die Lombok-Annotation `@NoArgsConstructor`. Dann aber geht der Builder wieder kaputt, außer man setzt dann noch die Annotation `@AllArgsConstructor`.
+- optional: `@Builder`-Annotation einsetzen, um unser POJO im Stile des Builder-Patterns zu erzeugen, statt mit Konstruktoren und hinterher gesetzten Werten zu arbeiten.
+  - Vorsicht bei Lombok: Die `@Builder`-Annotation macht den leeren Konstrktur kaputt macht bei der POJO, d.h. wenn man den braucht, braucht man noch die Lombok-Annotation `@NoArgsConstructor`.
+    Dann aber geht der Builder wieder kaputt, außer man setzt dann noch die Annotation `@AllArgsConstructor`.
+    Da JPA (brauchen wir später) sowieso den leeren (oder den vollen?) Konstruktor braucht, sieht man diese beiden Annotations auch häufig bei Entity-Klassen in Spring-Projekten.
   ```java
   import lombok.Builder;
   import lombok.Getter;
@@ -264,12 +306,14 @@ Mehr Infos [bei Baeldung](https://www.baeldung.com/intro-to-project-lombok).
   }
   ```
 
-### Welcome Page
+
+
+### 4) Statische Seiten: Welcome Page
 Damit wir uns nicht die Pfade merken müssen, basteln wir uns eine statische, stinknormale HTML-Startseite, ganz ohne Thymeleaf.
 Spring (bzw. Spring Boot?) erkennt alle in `src/main/resources/static` abgelegten HTML-Dateien und antwortet auf GET-Requests mit einem Pfad, der sich mit dem Pfad von abgelegten Dateien auf `static/` deckt, mit der entsprechenden HTML-Datei.
 
 In folgender Hauptseite (`static/index.html`) zeigen wir unsere bisherigen Links klickbar an.
-Dafür legen wir eine Datei `index.html` in den Ordner `src/main/resources/static`:
+Dafür legen wir eine Datei `index.html` in den Ordner `src/main/resources/static` und diese können wir dann anzeigen, wenn das Programm läuft und wir `localhost:8080` öffnen:
   ```html
   <!DOCTYPE HTML>
   <html lang="de">
@@ -287,11 +331,20 @@ Dafür legen wir eine Datei `index.html` in den Ordner `src/main/resources/stati
   </body>
   </html>
   ```
-  - wie wir die Unterseite mit Input öffnen können, ohne ihn selbst in die URL zu schreiben, sehen wir später im Kapitel zu HTML-Forms.
-    Zunächst reichen uns diese fest gesetzten Links.
+
+Wie wir die Unterseite mit Input öffnen können, ohne ihn selbst in die URL zu schreiben, sehen wir später im Kapitel zu HTML-Forms.
+Zunächst reichen uns diese fest gesetzten Links.
+
+Wie bei statischen HTML-Seiten üblich, wird die `index.html` geöffnet, wenn man zu dem enthaltenden Ordner navigiert, aber keine Datei angibt.
+Die im folgenden erstellte Datei erreichen wir dann lokal also unter `localhost:8080` und unter `localhost:8080/index.html`.
+Wenn wir ein paar mehr Ordner und dann darin eine Datei erstellen, mit Pfad `src/main/resources/static/ordner/nocheiner/hey.html`, dann müssen wir sie so aufrufen:  
+`localhost:8080/ordner/nocheiner/hey.html`
 
 
-## 4) Thymeleaf mit Styling
+
+## 5) Dateien in Thymeleaf verlinken: Styling mit CSS
+
+### 5.a) Thymeleaf mit Styling
 
 Wie auch in HTML-Dateien, können wir oben im `<head>`-Tag Thymeleaf-Template eine CSS-Datei mithilfe des HTML-Tags `<link>` einbinden.
 Damit das Backend, auch wenn es gebaut ist und auf irgendeinem Server läuft, noch den Pfad zur Datei findet, nutzen wir Thymeleafs URL-Syntax.
@@ -315,7 +368,9 @@ Als Beispiel stylen wir unser Template für die Begrüßung.
   <link rel="stylesheet" th:href="@{/greeting-styles/boring.css}">
   ```
 
-### CSS je nach RequestParam
+
+
+### 5.b) CSS je nach RequestParam
 Jetzt wollen wir eine weitere CSS-Datei erstellen und diese nutzen, wenn ein passender RequestParam beim GET-Request mitgegeben wurde.
 - Endpunkt anpassen:
   ```java
@@ -394,7 +449,7 @@ In der ausgewählten CSS-Datei können alle Werte aus `boring.css` überschriebe
 
 
 
-## 5) Optionaler Abschweifer: Kollaborativ arbeiten mit git (mit einem remote Repository, zB bei Github oder Gitlab)
+## 6) Optionaler Abschweifer: Kollaborativ arbeiten mit git (mit einem remote Repository, zB bei Github oder Gitlab)
 Gemeinsam erweitern wir unsere Hauptseite um weitere Begrüßungslinks.
 Folgende konzeptionellen Schritte müssen wir dafür durchgehen:
 - wir ziehen uns mit `git clone` den aktuellen Stand vom Dozenten
@@ -416,26 +471,26 @@ Dafür werden wir folgende Befehle brauchen:
     - `git merge <BRANCH_NAME>` versucht, die Änderungen des angegebenen Branches in den rein zu ziehen, in dem wir uns aktuell lokal befinden
     - `git mergetool` zum Nutzen einer optional eingerichteten Software, mit der mögliche Merge Konflikte mit einer GUI behandelt werden können
 
-Nach Ausführen von Schritten 1 bis 3, können wir lokal das Projekt in unserer IDE öffnen und unsere Begrüßung ergänzen.
+Nach Ausführen von Befehlen 1 bis 3, können wir lokal das Projekt in unserer IDE öffnen und unsere Begrüßung ergänzen.
 - erstelle neue CSS-Datei unter `static/greeting-styles/`
   - möglichst Namenskollisionen mit anderen Leuten im Kurs vermeiden, damit es später leichter ist, die Pull Requests ohne Konflikte zu vereinen
 - ergänze Link mit passenden RequestParams für Name und CSS-Datei in der `index.html`
 - erstelle Commit, wenn alles funktioniert
 - mit `git push` wird der branch mit dem neuen Commit gepusht
-- am Beamer geht es weiter.
+- am Beamer geht es weiter mit der UI von Github, um die branches in den main-Branch zu mergen
 
-Schritt 4 führen wir nur aus, um lokal zwei Branches zu mergen.
+Befehl 4 führen wir nur aus, um lokal zwei Branches zu mergen.
 Wenn es dabei zu Konflikten kommt, kann ein unter `git mergetool` eingerichtetes Programm helfen, übersichtlich Änderungen manuell zu vereinen.
 
 Stattdessen nutzen wir aber die GUI von Github, um einen Pull Request zu erstellen, den der Repository-Besitzer (oder jemand mit passenden Rechten) auch in der GUI von Github annehmen kann.
   - Achtung: bei Github muss man erst als "Collaborator" hinzugefügt werden und hat dann auch Rechte, auf main zu pushen, und das kann wohl nicht eingestellt werden.
-    Bei Gitlab können "Members" mit verschiedenen Berechtigungen hinzugefügt werden.
+    Bei Gitlab können "Members" mit verschiedenen Berechtigungen hinzugefügt werden, die dann zB nur auf Branches pushen können, die nicht speziell geschützt sind (wie zB der main-Branch).
 
 
 
-## 6) `curl` und verschiedene Rückgabe dank Request-Headers
+## 7) `curl` und verschiedene Rückgabe dank Request-Headers
 
-### Im Webbrowser (zB Firefox)
+### 7.a) Im Webbrowser (zB Firefox)
 
 Die Headers eines HTTP-Requests können dem empfangenden Backend weitere Informationen mitgeben, wie gewünschtes Dateiformat oder Sprache.
 Beispielhaft wollen wir unsere bisherigen zwei Endpunkte mit jeweils HTML- und JSON-Rückgabe abändern, sodass sie unter dem gleichen Pfad erreichbar sind.
@@ -461,9 +516,10 @@ Mit einem Rechtsklick auf den Request oben und dann Klick auf `Edit and Resend`,
 Als Antwort bekommen wir jetzt den Status-Code `406 Not Acceptable`, denn unser Backend liefert hinter diesem Pfad noch keine JSON.
 Das ändern wir jetzt und probieren das gleiche nochmal.
 
-### Endpunkte mit gleichem Pfad, aber verschiedenen Rückgabetypen
 
-Wenn wir bei unseren beiden bisherigen Endpunkten in der Annotation `@GetMapping("...")` den gleichen String als Pfad übergeben und dann unser Programm starten, stürzt es direkt ab, u.a. mit Fehler 
+### 7.b) Endpunkte mit gleichem Pfad, aber verschiedenen Rückgabetypen
+
+Wenn wir bei unseren beiden bisherigen Endpunkten in der Annotation `@GetMapping("...")` den gleichen String als Pfad übergeben und dann unser Programm starten, stürzt es direkt ab, u.a. mit Fehler
 `java.lang.IllegalStateException: Ambiguous mapping. Cannot map 'greetingController' method`
 
 Wir müssen die Endpunkte noch nach Rückgabetyp unterscheiden.
@@ -482,7 +538,7 @@ Ansonsten ändern wir nichts an den Endpunkten.
 Jetzt können wir unseren Request mit angepassten Headern erneut in den Dev-Tools von Firefox abschicken und die JSON-Antwort sehen.
 
 
-### Requests abschicken mit `curl`
+### 7.c) Requests abschicken mit `curl`
 
 Die beiden GET-Requests können wir folgendermaßen im Terminal mit `curl` ausführen, um uns für spätere POST-Requests aufzuwärmen:
 
@@ -504,9 +560,19 @@ curl localhost:8080/greeting?name=Paul -H "accept: application/json"
 
 Beim vorletzten `curl`-Befehl sind die String-Delimiter beim Pfad wichtig, da sonst das `&`-Zeichen im Pfad zu Problemen führt.
 
+Tipp: wenn du einen langen Befehl im Terminal übersichtlicher schreiben willst, kannst du auch im Terminal mehrere Zeilen nutzen.
+Wenn du `\` eingibst und dann `Enter` (Taste für neue Zeile) drückst, dann wird der Befehl nicht ausgeführt, sondern eine neue Zeile gestartet.
+Wenn du dann irgendwann `Enter` drückst, ohne direkt davor `\` einzugeben, wird der Befehl ausgeführt.
+So kann man auch mehrzeilige Befehle zum Kopieren bereitstellen, die man sich dann auch mehrzeilig ins Terminal einfügen kann.
+Hier ist der letzte `curl`-Befehl nochmal, in mehreren Zeilen:
+```
+curl localhost:8080/greeting?name=Paul \
+  -H "accept: application/json"
+```
 
 
-## 7) POST-Requests
+
+## 8) POST-Requests
 
 Laut HTTP ist das POST-Verb dafür gedacht, Datensätze anzulegen.
 Praktisch wird es häufig einfach dafür verwendet, bei einem HTTP-Request einen Request Body mitschicken zu können -- normalerweise mit einem JSON-Objekt als Datenobjekt.
@@ -561,10 +627,10 @@ Dafür brauchen wir nur statt `@GetMapping` ein `@PostMapping` und außerdem noc
 
 
 
-## 8) HTML-Form für GET- und POST-Requests
+## 9) HTML-Form für GET- und POST-Requests
 Die Daten, die wir mit einem Request mitschicken, wollen wir aus einer Eingabe vom User nehmen.
 
-#### Ohne Thymeleaf, nur HTML
+### 9.a) Ohne Thymeleaf, nur HTML
 Da es bei einem GET-Request keinen Body gibt, werden die Eingaben als Key-Value-Pairs (oder hier treffender: Name-Value-Pairs) in die Request-Parameter hinter den Pfad gehängt.
 
 Fügen wir die folgende HTML-Form in unsere `index.html` ein, dann kann der User den anzuzeigenden Namen eintippen und die anzuzeigende CSS auswählen.
@@ -589,7 +655,7 @@ Probiere es aus und schaue nach, wie nach Abschicken des Formulars der Request i
       <option value="style-jasmin">Jasmin</option>
       <option value="style-alex">Alex</option>
       <option value="a">Leer</option>
-    </select> 
+    </select>
   </div>
   <div>
     <button>Hallo?</button>
@@ -660,37 +726,32 @@ curl -X POST \
 ```
 
 
-#### Mit Thymeleaf
+### 9.b) Mit Thymeleaf
 
 Hier ist der Link zur Dokumentation von Thymeleaf bezüglich Forms: https://www.thymeleaf.org/doc/tutorials/2.1/thymeleafspring.html#creating-a-form
 
 
 
 
-## 9) Daten speichern in einer Datenbank
-
-***TODO ALEX: dieses Kapitel ist noch nicht fertig***
-
-<!--
-TODO ALEX: evtl In-Memory bereits for POST-Requests, sodass wir bei den POSTs Daten speichern und zurückgeben können. Dann an dieser Stelle persistieren in File?
+## 10) Daten speichern in einer Datenbank
 
 Unsere Daten wollen wir jetzt auch mal abspeichern, sodass sie nach einem Request noch verfügbar sind.
 
 Es gibt viele Lösungen für Datenbanken, die man anbinden kann.
 Manche laufen als "In-Memory"-Datenbank und werden, wie der Arbeitsspeicher bei einem Laptop, komplett gelöscht beim Ausschalten des Programms.
-In solchen Datenbanken werden vor allem Dateien gecached, nicht auf Dauer zur Nutzung über mehrere Sitzungen persistiert.
+In solchen Datenbanken werden vor allem Dateien gecached, d.h. nicht auf Dauer zur Nutzung über mehrere Sitzungen persistiert.
 
 Wir verwenden hier H2 ("Hypersonic 2") als Datenbank.
-H2 ist in Java geschrieben und bietet bei Spring eine einfache Einbindung mit tollen Features zum Herumprobieren. 
+H2 ist in Java geschrieben und bietet bei Spring eine einfache Einbindung mit tollen Features zum Herumprobieren.
 
 Mehr Infos zu Spring mit H2: https://www.baeldung.com/spring-boot-h2-database
 
 
-### Spring JPA und H2-Datenbank (In-Memory mode: temporär)
 Mit JPA (und für Feinschmecker dabei: JPQL) sparen wir uns das Schreiben der SQL-Queries.
 Damit JPA irgendwelche Daten ansprechen kann, brauchen wir dann auch eine Datenbank, mit der sich unser Programm verbinden kann.
 
-#### JPA im Projekt einbinden
+
+### JPA Dependency im Projekt einbinden
 ENTWEDER ganz am Anfang im Spring-Initializr eine weitere Dependency auswählen: **Spring Data JPA**.
 ODER einfach in der `pom.xml` folgendes einfügen in dem `<dependencies>`-Tag:
   ```xml
@@ -706,7 +767,7 @@ Wenn wir jetzt Starten (im Terminal mit `./mvnw spring-boot:run` oder über Play
   ```
   - kurz gesagt: Spring findet keine Datenbank, also erstellen wir eine
 
-#### H2-Datenbank erstellen
+### H2-Datenbank erstellen
 Mit Maven binden wir ganz einfach H2 ein.
 Am besten selbst selbst mit einer Suchmaschine zB nach "maven h2" suchen und bei der Seite von `mvnrepository.com` zu H2 landen.
 Dort auf eine neue Version klicken, den `<dependency>`-Tag rauskopieren und dann einfügen in die `pom.xml`.
@@ -727,7 +788,6 @@ Die Einbindung der Dependency in Maven sollte bereits ausreichen.
 Spring setzt bei H2 automatisch Default-Werte.
 Diese Setzen wir aber trotzdem noch manuell in den `application.properties`, weil wir sie später noch anpassen möchten.
 Und damit wir ein Gefühl für solche Konfigurationen bekommen:
-  - TODO ALEX checken, ob es die default-Konfig für H2 wirklich nicht braucht
   ```
   spring.datasource.url=jdbc:h2:mem:testdb
   spring.datasource.driverClassName=org.h2.Driver
@@ -740,11 +800,28 @@ Und damit wir ein Gefühl für solche Konfigurationen bekommen:
 
 ### Initiale Tabellen und Datensätze anlegen
 
-TODO ALEX
-- wir könnten mit POST-Requests (curl) selbst Daten basteln, aber wir haben noch keine Speicherung der Daten über Endpunkte implementiert, d.h. das schauen wir uns erst später an
-- zuerst mit dem CommandLineRunner Bean nahe der main ein paar JPA-Queries abfeuern
-- dann evtl die Lösung in irgendeinem Firefox-Tab mit der .sql-Datei, die Spring wohl automatisch aufsammelt? -> mehr recherchieren
-- dann ersetzen wir das aber durch Flyway-Migration-Skripte
+Am besten mit Flyway, aber zunächst überlegen wir uns, wie es noch möglich wäre.
+
+Wir könnten mit POST-Requests (zB curl oder mit dafür gebasteltem Frontend) selbst Daten einpflegen, aber wir haben noch keine Speicherung der Daten über Endpunkte implementiert.
+Außerdem haben wir auch noch kein Repository, das uns die Queries ausführt (OR-Mapper, machen wir aber weiter unten).
+
+Auch nichts, was ich empfehle, aber anscheinend kann man bei Spring beim Ausführen des Programmes Code ausführen mit der `CommandLineRunner` Bean, und so direkt beim Start ein paar Datensätze mit JPA (oder auch klassisch mit JDBC und selbstgeschriebenen Queries) anlegen. Mehr Infos hier: https://spring.io/guides/gs/accessing-data-jpa#_create_an_application_class
+
+Was wir aber machen werden, und was auch besonders empfehlenswert ist, ist die Nutzung eines DB-Migration Tools wie ***Flyway*** oder ***Liquibase***.
+Wir werden Flyway verwenden.
+
+DB-Migrations sind im Grunde einfach versionierte Datenbankqueries, die für uns ausgeführt werden, wenn wie bei dieser Datenbank noch nicht ausgeführt wurden.
+So können wir sicherstellen, dass Queries nicht mehrfach ausgeführt werden, auch wenn unser Programm zB täglich neu gestartet wird.
+Flyway übernimmt für uns dabei den Aufwand, das zu kontrollieren.
+Bei Flyway selbst schreiben wir aber wieder normale SQL-Queries (oder den verfügbaren Dialekt, zB PostgresQL bei einer Postgres-Datenbank).
+
+
+#### Flyway einbinden
+
+[Tutorial dazu bei Baeldung](https://www.baeldung.com/database-migrations-with-flyway)
+
+Siehe Commits und Hilfe von Johannes. Link von Baeldung ist nicht so geil, weil nicht für Spring gedacht. Dort aber Benennungsschema noch rausnatzen.
+
 
 
 
@@ -753,7 +830,9 @@ TODO ALEX
 Als file anlegen (damit wir über den Browser mal reinschauen können):
   ```
   spring.datasource.url=jdbc:h2:file:./data/mynewdb
-  ``` 
+  ```
+
+Tipp: in die `.gitignore` die Zeile `data/` einfügen, damit die DB-Datei nicht commited wird.
 
 Manueller Zugriff auf persistierte H2-Datenbank im Browser unter `localhost:8080/h2-console`
 	- dort passenden Pfad zur Datei eingeben, sollte danach immer gespeichert bleiben im Browser. Eventuell auch Passwort und Username, falls man die in den `application.properties` geändert hat
@@ -771,20 +850,148 @@ CREATE TABLE journal_entry (
 INSERT INTO journal_entry VALUES (1, 'Start', 'es geht los', 'So fing alles an. Was ist schon lange her, dass ...');
 INSERT INTO journal_entry VALUES (2, 'Abend', 'hammer', 'Was ein Tag es war, was ich alles gelernt habe ...');
 ```
--->
 
-## 10) User-Authentication und Rollen / Berechtigungen
 
-Ein guter Link von der offiziellen Spring Seite zum mal drüberlesen: https://spring.io/guides/gs/securing-web
+  curl localhost:8080/person \
+      -X POST \
+      -H 'Content-Type: application/json' \
+      -d '{ "name":"Paul", "email":"paul@example.com", "married": true}'
 
-Ein sehr vielversprechend aussehender Link zum wirklich umsetzen: https://www.geeksforgeeks.org/spring-security-tutorial/
+
+
+### TODO
+- JPA Query Methods Link: https://docs.spring.io/spring-data/jpa/reference/jpa/query-methods.html
+
+
+## 11) GET-Requests mit `@Pathvariable`
+
+TODO Wiederholung: @RequestBody, @RequestParam, @ResponseBody
+
+TODO neu: @PathVariable, für GET einzelne Entity
+
+```java
+@GetMapping(value = "/person")
+@ResponseBody
+public List<Person> getPersons() {
+    return personService.getAll();
+}
+
+@GetMapping(value = "/person/{personId}")
+@ResponseBody
+public Person getPersonById(
+  @PathVariable(name="personId") Long personId
+) {
+    return personService.getById(personId);
+}
+```
+
+
+
+## 12) User-Authentication und Rollen / Berechtigungen (ohne Datenbankeinträge)
+
+## 12.a) Spring Default Login-Seite, Absicherung von Pfaden, hardcoded Users
+
+In unserer `pom.xml` fügen fügen wir folgendes ein, um ***Spring Boot Starter Security*** nutzen zu können:
+```xml
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+```
+
+Jetzt erstellen wir eine neue Datei mit folgendem Inhalt.
+Was die einzelnen Zeilen machen und welche anderen zeilen wir nutzen könnten, steht in Kommentaren im Code.
+```java
+package com.academy.my_first_spring_project;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+@EnableWebSecurity
+public class WebSecurityConfig {
+
+  @Bean
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http.authorizeHttpRequests((requests) -> requests
+            // .requestMatchers("/welcome").permitAll() // alle Pfade, die mit "/welcome" anfangen, sind für alle erlaubt, auch für nicht-eingeloggte User
+            // .requestMatchers("/manage/**").hasRole("ADMIN") // alle Pfade, die mit "/manage" anfangen, sind nur für User mit Rolle "ADMIN" erreichbar
+            .anyRequest().authenticated() // alle anderen Pfade sind nur mit erfolgreichem Login erreichbar
+    );
+
+    // erstellt eine Standard-Login-Seite (im Bootstrap-Design) unter dem Pfad "/login" und leitet nicht-eingeloggte User, die sich einloggen müssen, automatisch dorthin. Außerdem hat diese Seite eine rote Meldung bei fehlgeschlagenen Logins. Zusätzlich gibt es durch diese Zeile unter dem Pfad "/logout" eine Seite mit einem Knopf zum ausloggen. Vorsicht!: dieser Logout-Knopf leitet zwar wieder zu "/login", aber der User ist noch nicht wirklich ausgeloggt. Für diese Funktionalität braucht man noch die Zeile http.logout(configurer -> configurer.invalidateHttpSession(true));
+    http.formLogin(Customizer.withDefaults());
+
+    // verwende stattdessen diese Zeile, zu der der User redirected wird, um eine eigene Login-Seite anzuzeigen. Die Seite sollte über den hier gewählten Pfad erreichbar sein. Dort sollte es eine Möglichkeit für den User geben, per POST "/login" den Usernamen und das Passwort abzuschicken, wie zB in der Standard-Login-Seite. Im RequestBody sollte dann sein: { username: "...", password: "..." }
+    // http.formLogin((form) -> form.loginPage("/mein/login/pfad").permitAll());
+
+    // hiermit wird der nicht-eingeloggte User über ein im Browser eingebautes Fenster zum Login (Username & Passwort) aufgefordert, falls die Zeile direkt hierüber fehlt (oder nicht funktioniert?) und auch sonst keine Login-Seite eingestellt wurde. Nach erfolgreichem Login landet man auf der gewünschten Seite, ansonsten wird die besuchte Seite komplett leer angezeigt.
+    http.httpBasic(Customizer.withDefaults());
+
+    // erstellt einen Endpunkt POST "/logout", durch dessen Aufruf der eingeloggte User ausgeloggt wird. Der Button auf der Standard-Logout-Seite (erzeugt zB durch http.formLogin(Customizer.withDefaults());) schickt genau diesen Request ab.
+    http.logout(configurer -> configurer.invalidateHttpSession(true));
+
+    return http.build();
+  }
+
+  // im folgenden Code erstellen wir hardgecoded zwei User. Einen mit Rolle "USER" und einen mit Rolle "ADMIN", jeweils mit passendem Username und Passwort. Hier können wir zum Rumprobieren User erstellen. Bei einem echten projekt müssten wir diese Infos in einer Datenbank speichern.
+  @Bean
+  public UserDetailsService userDetailsService() {
+    @SuppressWarnings("deprecation")
+    UserDetails user =
+        User.withDefaultPasswordEncoder()
+            .username("user")
+            .password("user")
+            .roles("USER")
+            .build();
+
+    @SuppressWarnings("deprecation")
+    UserDetails admin =
+        User.withDefaultPasswordEncoder()
+            .username("admin")
+            .password("admin")
+            .roles("ADMIN")
+            .build();
+
+    return new InMemoryUserDetailsManager(user, admin);
+  }
+}
+```
+
+### 12.b) `@PreAuthorize` für Rollenprüfung auf Methodenlevel
+
+Hier eine gute Dokumentationsseite zum Thema für mehr Details: https://docs.spring.io/spring-security/reference/servlet/authorization/method-security.html#method-security-architecture
+
+Wenn wir zu unserer mit `@Configuration` annotierten Klasse `WebSecurityConfig` vom vorherigen Unterkapitel noch die Annotation `@EnableMethodSecurity` hinzufügen, können wir die Annotation `@PreAuthorize` nutzen, um Endpunkte und sonstige (Service-)Methoden oder auch ganze (Controller- / Service-)Klassen nur für User mit bestimmten Rollen zu erlauben.
+
+Dafür setzen wir als Annotation an den Kopf einer Klasse oder Methode zB so eine Zeile: `@PreAuthorize("hasRole('ADMIN')")`
+
+
+
+### 12.c) Für weitere Recherche
+
+Hier gibt es richtig viel für alle möglichen Funktionalitäten, die man sich wünschen kann (wurde nicht überprüft, ob das funktioniert, sieht aber gut aus):
+https://www.geeksforgeeks.org/spring-security-tutorial/
+
+Ein guter Link von der offiziellen Spring Seite zur Einführung in die Basics, ähnlich wie hierüber in der Anleitung: https://spring.io/guides/gs/securing-web
+
+Von Baeldung auch einer zu den Basics:
+https://www.baeldung.com/spring-enablewebsecurity-vs-enableglobalmethodsecurity
 
 
 
 
 # Anhang
 
-## A) git, ein Refresher
+## A) git, ein knapper Refresher
 
 Bei Ubuntu normalerweise vorinstalliert. Bei Windows [installieren](https://git-scm.com/download/win) und dann neues "git Bash"-Terminal nutzen.
 
