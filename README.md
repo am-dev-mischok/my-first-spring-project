@@ -781,3 +781,73 @@ Ein sehr vielversprechend aussehender Link zum wirklich umsetzen: https://www.ge
 
 
 
+
+# Anhang
+
+## A) git, ein Refresher
+
+Bei Ubuntu normalerweise vorinstalliert. Bei Windows [installieren](https://git-scm.com/download/win) und dann neues "git Bash"-Terminal nutzen.
+
+### A.1) Nützliche Quellen
+Tolle Videos zum Einstieg und als Refresher von Fireship:
+- [Git explained in 100 Seconds](https://www.youtube.com/watch?v=hwP7WQkmECE)
+- [13 Advanced (but useful) Git Techniques](https://www.youtube.com/watch?v=ecK3EnyGD8o)
+
+Die offizielle Seite hat auch eine [ausführliche Anleitung](https://git-scm.com/book/en/v2).
+
+
+### A.2) Überblick Befehle
+
+#### git init
+- erstellt den versteckten .git-Ordner, durch den ein Ordner zu einem git-Repository wird
+
+---
+
+#### git add**
+- bereitet Änderungen darauf vor, im nächsten Commit abgespeichert zu werden
+- **git add .** bereitet alle Änderungen des aktuellen Ordners (und seiner Nachfahren) für den nächsten Commit vor
+- **git add -p** entscheide stückweise, welche Änderungen für den nächsten Commit vorbereitet werden
+
+#### git commit -m "hier meine Commit message"
+- erstellt einen neuen Commit, welcher alle vorbereiteten Änderungen als neue Version speichert, zusammen mit einer Text, der die Änderungen dieser Version beschreibt
+- lasse **-m** und die Commit-Message weg, dann öffnet sich ein Editor, in den du die Message eintippen musst. Jeder Commit braucht eine Commit-Message
+
+#### git push
+- lade aktuellen Stand hoch auf remote Repository (muss vorher eingerichtet werden, zB auf github; am besten dort ein leeres Repository erstellen und dann in dem leeren Repository in der Web UI die Befehle nachschauen)
+
+#### git pull
+- lade aktuellen Stand von remote herunter (muss vorher eingerichtet sein)
+
+---
+
+#### git status
+- zeigt aktuellen Status geänderter Dateien und ob sie für den nächsten Commit vorbereitet wurden, inklusiver Tipps zum Vorgehen für den nächsten Commit
+
+#### git diff
+- zeige alle Änderungen seit dem letzten Commit an, die noch nicht für den nächsten Commit vorbereitet wurden. Runterscrollen im Terminal mit Enter oder Leertaste , Beenden mit der Taste "q".
+- am Ende noch zwei Commit-Hashes oder zwei Dateinamen hinzufügen, um diese jeweils miteinander zu vergleichen
+
+#### git log
+zeige alle vergangenen Commits an
+
+---
+
+#### git clone
+- lädt ein Projekt von Github oder Gitlab runter auf unseren Laptop, inklusive aller git-Sachen, die dran hängen
+
+#### git branch
+- Branch erstellen: **git branch <BRANCH_NAME>**, dann muss man noch wechseln zum gerade erstellten Branch
+
+#### git checkout
+- zu einem Branch wechseln: **git checkout <BRANCH_NAME>**
+- einen Branch erstellen und direkt wechseln: **git checkout -b <BRANCH_NAME>**
+- alle lokalen Änderungen einer Datei rückgängig machen, die noch nicht commitet wurden (Vorsicht, die Änderungen sind für immer weg!): **git checkout <FILE_NAME>**
+#### git merge
+- **git merge <BRANCH_NAME>** versucht, die Änderungen des angegebenen Branches in den rein zu ziehen, in dem wir uns aktuell lokal befinden
+- **git mergetool** zum Nutzen einer optional eingerichteten Software, mit der mögliche Merge Konflikte mit einer GUI behandelt werden können
+
+---
+
+#### git alias
+- setze Abkürzungen und kombinierte Befehle, die du dann vereinfacht nutzen kannst. Mehr Infos und Beispiele: https://git-scm.com/book/en/v2/Git-Basics-Git-Aliases
+
