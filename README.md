@@ -40,7 +40,7 @@ Folgende Funktionalitäten werden wir haben:
   - Antwort
     - mit ***Thymeleaf*** direkt eine HTML-Seite als renderbares Frontend
     - oder einfach Daten als **JSON**
-      - später auch mit selbst gesetztem *HTTP-Status-Code* und weiteren Informationen im *HTTP-Header* TODO ALEX
+      - später auch mit selbst gesetztem *HTTP-Status-Code* und weiteren Informationen im *HTTP-Header* (TODO ALEX)
 - mit Code-Generator ***Lombok*** sparen wir uns Boilerplate-Code und lernen **Annotations** kennen
 - ganz normale HTML-Seiten anzeigen
 - Datenbank zum Speichern von Daten
@@ -131,7 +131,7 @@ Wir starten mit der Grundstruktur, die wir aus dem [Spring initializr](https://s
     }
     ```
 - erstelle `greeting.html` in `src/main/resources/templates`, mit folgenden Code (genommen aus der [Spring-Anleitung](https://spring.io/guides/gs/serving-web-content#initial), aber hier noch `${name}` rausgenommen)
-  - ACHTUNG!: die einzelnen Anführungszeichen um `Hello World!` im folgenden Beispielcode sind wichtig!
+  - **ACHTUNG!**: die einzelnen Anführungszeichen um `Hello World!` im folgenden Beispielcode sind wichtig!
     Durch die doppelten Anführungszeichen wird erst der Input für Thymeleaf ermöglicht, aber dann muss man die einzelnen Anführungszeichen noch als String-Delimiter setzen.
     Das nicht zu tun, wäre so falsch, wie in Java `String text = Hello World!;` ohne String-Delimiter zu schreiben.
     ```html
@@ -241,7 +241,7 @@ Sondern wir geben einfach ein POJO (=*Plain Old Java Object*) zurück und Spring
       return person;
   }
   ```
-  - Achtung: hier auch `Model model` bei den Eingabeparametern weglassen, das brauchen wir nur für Thymeleaf!
+  - **Achtung**: hier auch `Model model` bei den Eingabeparametern weglassen, das brauchen wir nur für Thymeleaf!
 
 
 
@@ -483,7 +483,7 @@ Befehl 4 führen wir nur aus, um lokal zwei Branches zu mergen.
 Wenn es dabei zu Konflikten kommt, kann ein unter `git mergetool` eingerichtetes Programm helfen, übersichtlich Änderungen manuell zu vereinen.
 
 Stattdessen nutzen wir aber die GUI von Github, um einen Pull Request zu erstellen, den der Repository-Besitzer (oder jemand mit passenden Rechten) auch in der GUI von Github annehmen kann.
-  - Achtung: bei Github muss man erst als "Collaborator" hinzugefügt werden und hat dann auch Rechte, auf main zu pushen, und das kann wohl nicht eingestellt werden.
+  - **Achtung**: bei Github muss man erst als "Collaborator" hinzugefügt werden und hat dann auch Rechte, auf main zu pushen, und das kann wohl nicht eingestellt werden.
     Bei Gitlab können "Members" mit verschiedenen Berechtigungen hinzugefügt werden, die dann zB nur auf Branches pushen können, die nicht speziell geschützt sind (wie zB der main-Branch).
 
 
@@ -496,7 +496,7 @@ Die Headers eines HTTP-Requests können dem empfangenden Backend weitere Informa
 Beispielhaft wollen wir unsere bisherigen zwei Endpunkte mit jeweils HTML- und JSON-Rückgabe abändern, sodass sie unter dem gleichen Pfad erreichbar sind.
 
 <b style="color: pink; background-color: black; padding: 0.1rem;">
-Achtung:
+**Achtung**:
 In unserem Beispiel machen diese zwei Endpunkte ganz verschiedene Dinge. Einer gibt eine Begrüßung zurück, der andere gibt ein Dummy POJO zurück.
 Zwei Endpunkte sollten nur unter dem gleichen Pfad erreichbar sein, wenn sie konzeptionell die gleiche Sache machen und zurückgeben.
 Damit unser Beispielcode schlank und einfach bleibt, ändern wir die JSON-Rückgabe aber nicht ab.
@@ -560,7 +560,7 @@ curl localhost:8080/greeting?name=Paul -H "accept: application/json"
 
 Beim vorletzten `curl`-Befehl sind die String-Delimiter beim Pfad wichtig, da sonst das `&`-Zeichen im Pfad zu Problemen führt.
 
-Tipp: wenn du einen langen Befehl im Terminal übersichtlicher schreiben willst, kannst du auch im Terminal mehrere Zeilen nutzen.
+**Tipp**: wenn du einen langen Befehl im Terminal übersichtlicher schreiben willst, kannst du auch im Terminal mehrere Zeilen nutzen.
 Wenn du `\` eingibst und dann `Enter` (Taste für neue Zeile) drückst, dann wird der Befehl nicht ausgeführt, sondern eine neue Zeile gestartet.
 Wenn du dann irgendwann `Enter` drückst, ohne direkt davor `\` einzugeben, wird der Befehl ausgeführt.
 So kann man auch mehrzeilige Befehle zum Kopieren bereitstellen, die man sich dann auch mehrzeilig ins Terminal einfügen kann.
@@ -636,7 +636,7 @@ Da es bei einem GET-Request keinen Body gibt, werden die Eingaben als Key-Value-
 Fügen wir die folgende HTML-Form in unsere `index.html` ein, dann kann der User den anzuzeigenden Namen eintippen und die anzuzeigende CSS auswählen.
 Beim `<form>`-Tag sind die Attribute `action` für den Pfad und `method` für das HTTP-Verb (bzw die HTTP-Methode) wichtig.
 
-Achtung: im folgenden Code sind CSS-Dateinamen enthalten, die bei Anfertigung der Anleitung von Umschülern erstellt wurden, nicht hier im Beispiel.
+**Achtung**: im folgenden Code sind CSS-Dateinamen enthalten, die bei Anfertigung der Anleitung von Umschülern erstellt wurden, nicht hier im Beispiel.
 Probiere es aus und schaue nach, wie nach Abschicken des Formulars der Request in der URL-Leiste deines Browsers (oder in den Dev-Tools) aussieht.
 ```html
 <h2>Begrüßungs-Generator</h2>
@@ -726,16 +726,23 @@ curl -X POST \
 ```
 
 
-### 9.b) Mit Thymeleaf
+### 9.b) Mit (möglichst wenig) Thymeleaf
 
 Hier ist der Link zur Dokumentation von Thymeleaf bezüglich Forms: https://www.thymeleaf.org/doc/tutorials/2.1/thymeleafspring.html#creating-a-form
 
+In einem späteren Kapitel basteln wir ein Thymeleaf-Template, in dem die Eingabefelder durch Daten aus einer bestehenden Entity (teilweise) vorausgefüllt sind.
+Dieses eine Template können wir dann verwenden, um neue Entities zu erstellen, existierende zu bearbeiten, und existierende im Detail anzuzeigen.
+Also drei Funktionen in einem Template!
 
 
 
-## 10) Daten speichern in einer Datenbank
+
+## 10) JPA und Datenbank
 
 Unsere Daten wollen wir jetzt auch mal abspeichern, sodass sie nach einem Request noch verfügbar sind.
+
+
+### 10.a) JPA und Datenbank anbinden
 
 Es gibt viele Lösungen für Datenbanken, die man anbinden kann.
 Manche laufen als "In-Memory"-Datenbank und werden, wie der Arbeitsspeicher bei einem Laptop, komplett gelöscht beim Ausschalten des Programms.
@@ -747,47 +754,45 @@ H2 ist in Java geschrieben und bietet bei Spring eine einfache Einbindung mit to
 Mehr Infos zu Spring mit H2: https://www.baeldung.com/spring-boot-h2-database
 
 
-Mit JPA (und für Feinschmecker dabei: JPQL) sparen wir uns das Schreiben der SQL-Queries.
+#### 10.a.I) JPA Dependency im Projekt einbinden
+
+Mit JPA (und für Feinschmecker dabei: [JPQL](https://www.baeldung.com/spring-data-jpa-query)) sparen wir uns das Schreiben der SQL-Queries.
 Damit JPA irgendwelche Daten ansprechen kann, brauchen wir dann auch eine Datenbank, mit der sich unser Programm verbinden kann.
 
-
-### JPA Dependency im Projekt einbinden
-ENTWEDER ganz am Anfang im Spring-Initializr eine weitere Dependency auswählen: **Spring Data JPA**.
-ODER einfach in der `pom.xml` folgendes einfügen in dem `<dependencies>`-Tag:
+Wir fügen in der `pom.xml` folgendes in den `<dependencies>`-Tag ein:
   ```xml
   <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-data-jpa</artifactId>
   </dependency>
   ```
+  - **Achtung**: Die von uns eingebundene Dependency [Spring Boot Starter Data JPA](https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa) ist nicht das gleiche, wie [Spring Data JPA](https://mvnrepository.com/artifact/org.springframework.data/spring-data-jpa), stelle unbedingt sicher, dass du die richtige Dependency hast!
 
-Wenn wir jetzt Starten (im Terminal mit `./mvnw spring-boot:run` oder über Play-Button in IntelliJ) gibt es einen Fehler:
+Wenn wir jetzt unser Programm starten (wie immer im Terminal mit `./mvnw spring-boot:run` oder über den Play-Button in IntelliJ), gibt es einen Fehler:
   ```
   Error creating bean with name 'entityManagerFactory' [...]
   ```
   - kurz gesagt: Spring findet keine Datenbank, also erstellen wir eine
 
-### H2-Datenbank erstellen
+#### 10.b.II) H2-Datenbank einbinden
+
 Mit Maven binden wir ganz einfach H2 ein.
-Am besten selbst selbst mit einer Suchmaschine zB nach "maven h2" suchen und bei der Seite von `mvnrepository.com` zu H2 landen.
-Dort auf eine neue Version klicken, den `<dependency>`-Tag rauskopieren und dann einfügen in die `pom.xml`.
-Sieht dann zum Beispiel so aus:
+Sieht dann zum Beispiel so aus als neue Dependency in unserer `pom.xml`:
 ```xml
 <dependency>
   <groupId>com.h2database</groupId>
   <artifactId>h2</artifactId>
-  <version>2.3.232</version>
 </dependency>
 ```
-- falls bisher noch nicht erwähnt: online wird direkt unter dem `<version>`-Tag wahrscheinlich noch ein `<scope>test</scope>` stehen.
+- falls bisher noch nicht erwähnt: wenn wir uns die Dependency online holen, wird direkt unter dem `<version>`-Tag wahrscheinlich noch ein `<scope>test</scope>` stehen.
   Hier wird festgelegt, in welchem Scope diese Dependency zur Verfügung stehen soll.
   Damit wollen wir uns aktuell nicht auseinander setzen, also können wir die Zeile auch weglassen.
   Mehr Infos: [Baeldung -- Maven Dependency Scopes](https://www.baeldung.com/maven-dependency-scopes)
 
-Die Einbindung der Dependency in Maven sollte bereits ausreichen.
 Spring setzt bei H2 automatisch Default-Werte.
-Diese Setzen wir aber trotzdem noch manuell in den `application.properties`, weil wir sie später noch anpassen möchten.
-Und damit wir ein Gefühl für solche Konfigurationen bekommen:
+Diese Setzen wir aber trotzdem noch manuell, weil wir sie gleich direkt noch anpassen möchten.
+Und auch damit wir ein Gefühl für solche Konfigurationen bekommen.
+Dafür kopieren wir folgende Zeilen in die Datei `application.properties`:
   ```
   spring.datasource.url=jdbc:h2:mem:testdb
   spring.datasource.driverClassName=org.h2.Driver
@@ -797,59 +802,167 @@ Und damit wir ein Gefühl für solche Konfigurationen bekommen:
   - die letzte Zeile hat einen leeren Wert, damit das Passwort leer bleibt und wir kein Passwort eingeben müssen.
     Für die lokale Entwicklung ist das praktisch.
 
+#### 10.b.III) H2: Modus wechseln von In-Memory zu File
+Mit diesen Default-Werten läuft die H2-Datenbank im **In-Memory**-Mode.
+Das heißt, dass die Datenbank bei jedem Programmstart neu erzeugt wird und beim Herunterfahren des Programms auch wieder gelöscht wird.
+Stattdessen können wir die Datei aber auch als Datei erstellt bekommen, im **File**-Mode.
+Dafür müssen wir nur die erste der oberen Konfigurationszeilen ändern.
+Der Teil `mem` muss zu `file` geändert werden und nach dem folgenden Doppelpunkt schreiben wir den Pfad hin, unter dem die Datenbank-Datei abgelegt werden soll.
+Für diese Anleitung stellen wir es so ein:
+  ```
+  spring.datasource.url=jdbc:h2:file:./data/mynewdb
+  ```
+  - die Datei liegt dann in einem Ordner `data/`, der durch das `./` (direkt davor) im Projektordner erstellt wird.
 
-### Initiale Tabellen und Datensätze anlegen
+**Tipp**: in die `.gitignore` die Zeile `data/` einfügen, damit die DB-Datei nicht commited wird und die lokalen Testdaten damit auch lokal bleiben, statt damit den Speicherplatz auf Github (oder Gitlab) zu vermüllen.
 
-Am besten mit Flyway, aber zunächst überlegen wir uns, wie es noch möglich wäre.
 
-Wir könnten mit POST-Requests (zB curl oder mit dafür gebasteltem Frontend) selbst Daten einpflegen, aber wir haben noch keine Speicherung der Daten über Endpunkte implementiert.
+#### 10.b.IV) H2-Console
+
+Mit dem Modus umgestellt zu File, können wir die H2-Console nutzen, um unsere Datenbank zu sehen und Queries auszuführen.
+Die H2-Console ist (wenn man die Default-Werte nicht extra geändert hat) verfügbar unter `localhost:8080/h2-console`, während unser Programm läuft.
+Dort muss man sich dann einloggen und auch den Dateipfad angeben, mit den Informationen aus unseren `application.properties`:
+
+![Screenshot vom Login bei der H2-Console](images/h2-console-login.png "Screenshot vom Login bei der H2-Console")
+
+Und hier sieht man, wie es nach dem Login aussieht, wenn man links bei "PERSON" auf den "+"-Knopf gedrückt hat, um die Spaltennamen auszuklappen, und dann rechts eine einfache Query geschrieben hat, mit der man alle vorhandenen Einträge angezeigt bekommt.
+Zu Demonstrationszwecken wurde hier vorab ein Eintrag erstellt.
+Dieser sollte jetzt noch nicht existieren, wenn man nur diese Anleitung bis hierher befolgt hat.
+
+![Screenshot von der H2-Console](images/h2-console-login.png "Screenshot von der H2-Console")
+
+
+##### Ausblick:  
+Bei Bedarf, oder bei größeren Projekten, würden wir eine andere Datenbank benutzen, statt H2.
+Zum Beispiel eine ***Postgres***-Datenbank, die neben höherer Performance bei vielen Usern auch noch den SQL-Dialekt ***PostgresQL*** hat, welcher viele Features bietet, den normales SQL nicht hat.
+Bei H2 gibt es sogar die Möglichkeit, PostgresQL und andere SQL-Dialekte einzustellen, die dann von H2 imitiert werden.
+
+
+### 10.b) Optionaler Abschweifer: Initiale Tabellen und Datensätze anlegen (auf veraltete und unschöne Art)
+
+Dieses Unterkapitel kann zum Verständnis und für die Arbeit mit verranztem Legacy-Code ganz nützlich sein.
+Es kann aber auch komplett übersprungen werden, wenn man weniger interessiert ist an nicht so gut funktionierenden, umständlicheren Lösungen.
+Im nächsten Unterkapitel werden wir stattdessen ordentlich mit ***Flyway*** initiale Tabellen und Daten anlegen und auch lernen, wie man spätere Anpassungen mit Flyway umsetzt.
+
+
+#### 10.b.I) Optionaler Abschweifer: Vorüberlegungen für initiale Daten (auf veraltete und unschöne Art)
+
+Wir könnten mit POST-Requests (zB mit `curl` oder mit dafür gebasteltem Frontend) selbst Daten einpflegen, aber wir haben noch keine Speicherung der Daten über Endpunkte implementiert in dieser Anleitung.
 Außerdem haben wir auch noch kein Repository, das uns die Queries ausführt (OR-Mapper, machen wir aber weiter unten).
+
+Aber selbst wenn wir bereits passende POST-Endpunkte hätten und ein für JPA eingerichtetes Repository, bräuchten wir passende Tabellen in der Datenbank.
+Diese können (oder "sollten") wir nicht durch Endpunkte anlegen lassen, da sonst unsere ganze Spring [MVC](https://de.wikipedia.org/wiki/Model_View_Controller)-Struktur verkompliziert oder unmöglich gemacht wird.
+
+Was wir also brauchen, 
 
 Auch nichts, was ich empfehle, aber anscheinend kann man bei Spring beim Ausführen des Programmes Code ausführen mit der `CommandLineRunner` Bean, und so direkt beim Start ein paar Datensätze mit JPA (oder auch klassisch mit JDBC und selbstgeschriebenen Queries) anlegen. Mehr Infos hier: https://spring.io/guides/gs/accessing-data-jpa#_create_an_application_class
 
-Was wir aber machen werden, und was auch besonders empfehlenswert ist, ist die Nutzung eines DB-Migration Tools wie ***Flyway*** oder ***Liquibase***.
-Wir werden Flyway verwenden.
+TODO ALEX finish
 
-DB-Migrations sind im Grunde einfach versionierte Datenbankqueries, die für uns ausgeführt werden, wenn wie bei dieser Datenbank noch nicht ausgeführt wurden.
+#### 10.c) Flyway zum Anlegen initialer Tabellen und Datensätze, sowie zum späteren Ändern des DB-Schemas
+
+Kommen wir zu einer schöneren Methode, die auch besonders empfehlenswert ist.
+Und zwar die Nutzung eines DB-Migration Tools wie ***Flyway*** oder ***Liquibase***.
+
+DB-Migrations sind im Grunde einfach versionierte Datenbankqueries, die für uns ausgeführt werden, wenn sie bei einer Datenbank noch nicht ausgeführt wurden.
 So können wir sicherstellen, dass Queries nicht mehrfach ausgeführt werden, auch wenn unser Programm zB täglich neu gestartet wird.
 Flyway übernimmt für uns dabei den Aufwand, das zu kontrollieren.
 Bei Flyway selbst schreiben wir aber wieder normale SQL-Queries (oder den verfügbaren Dialekt, zB PostgresQL bei einer Postgres-Datenbank).
 
+Wir werden Flyway verwenden.
 
-#### Flyway einbinden
-
-[Tutorial dazu bei Baeldung](https://www.baeldung.com/database-migrations-with-flyway)
-
-Siehe Commits und Hilfe von Johannes. Link von Baeldung ist nicht so geil, weil nicht für Spring gedacht. Dort aber Benennungsschema noch rausnatzen.
+Hier ist ein Tutorial dazu bei Baeldung, aber nicht speziell für Spring und deswegen für uns nur teilweise brauchbar.
+Vieles davon können wir uns sparen: https://www.baeldung.com/database-migrations-with-flyway
 
 
+#### 10.c.I) Flyway einbinden (in einem Spring Projekt)
 
-
-### Datenbank persisteren: H2-Datenbank, als File lokal abgespeichert
-
-Als file anlegen (damit wir über den Browser mal reinschauen können):
+Das müssen wir tun:
+- Dependency in unsere `pom.xml`:
+  ```xml
+  <dependency>
+    <groupId>org.flywaydb</groupId>
+    <artifactId>flyway-core</artifactId>
+  </dependency>
   ```
-  spring.datasource.url=jdbc:h2:file:./data/mynewdb
-  ```
 
-Tipp: in die `.gitignore` die Zeile `data/` einfügen, damit die DB-Datei nicht commited wird.
+... und das war es eigentlich schon, weil Spring alles andere für uns übernimmt.
 
-Manueller Zugriff auf persistierte H2-Datenbank im Browser unter `localhost:8080/h2-console`
-	- dort passenden Pfad zur Datei eingeben, sollte danach immer gespeichert bleiben im Browser. Eventuell auch Passwort und Username, falls man die in den `application.properties` geändert hat
 
-TODO ALEX VERSCHIEBEN:
-Schreibe SQL-Queries, um eine neue Tabelle zu erstellen mit 2-3 Einträgen:
-```sql
-CREATE TABLE journal_entry (
-    id int NOT NULL,
-    name varchar(50) NOT NULL,
-    description varchar(255),
-    content text,
-    PRIMARY KEY (id)
-);
-INSERT INTO journal_entry VALUES (1, 'Start', 'es geht los', 'So fing alles an. Was ist schon lange her, dass ...');
-INSERT INTO journal_entry VALUES (2, 'Abend', 'hammer', 'Was ein Tag es war, was ich alles gelernt habe ...');
+#### 10.c.II) Flyway nutzen
+
+Jetzt können wir immer, wenn wir eine einmalige Änderung an der Datenbank vornehmen wollen, eine SQL-Query (oder den von unserer Datenbank unterstützen SQL-Dialekt) schreiben und dank Flyway wird diese Query bei jeder Datenbank, die mit unserem Programm im Einsatz ist (zB lokal auf Geräten der Entwickler, beim online Testing-System, beim vom Kunden genutzten online Produktiv-System, ...) nur genau einmal ausgeführt.
+Damit die Flyway-Skripte kompatibel sind mit verschiedenen SQL-Dialekten, ist es eine gute Angewohnheit, möglichst wenige Features aus Dialekten zu nutzen und stattdessen bei normalem SQL zu bleiben, wenn möglich.
+
+Wenn wir neue Queries haben, die durch Flyway 1x ausgeführt werden sollen, müssen wir nur eine Datei erstellen im vom Spring dafür standardmäßig vorgesehenen Ordner: `src/main/resources/db/migration/`
+Diese Datei sollte, nach Name alphabetisch sortiert, nach allen anderen bereits vorhandenen Dateien kommen, damit FLyway die Dateien in der richtigen Reihenfolge ausführt.
+Standardmäßig werden Migrations-Dateien bei Flyway nach diesem Schema benannt (und ich habe beim Schreiben dieser Anleitung nicht ausprobiert, ob das nur eine optionale oder eine verpflichtende Konvention ist. Bonusaufgabe für den interessierten Leser, der sich nicht an Konventionen halten will und sich damit unbeliebt macht bei anderen Entwicklern):
 ```
+<Prefix><Version>__<Description>.sql
+```
+
+So könnten zum Beispiel mehrere Dateinamen in einem fortgeschrittenen Projekt aussehen:
+```
+V1.000__CREATE_TABLE_PERSON.sql
+...
+V1.005__DROP_UNIQUE_NAME_FROM_USER.sql
+...
+V1.017__ALTER_TABLE_TEACHER.sql
+...
+V2.013__CREATE_TABLE_TASK_AND_INSERT_STARTING_ENTRIES.sql
+...
+```
+
+**Achtung!**: eine erstellte Migration-Datei, die auf irgendeiner Datenbank bereits ausgeführt wurde, darf nicht mehr verändert werden.
+Selbst SQL-Kommentare oder Dateinamenänderungen werden sonst zu einem Fehler führen, da Flyway (oder auch Liquibase) mithilfe von Hashes sicherstellt, dass die Migrations konsistent bleiben.
+Kurz: wenn das Programm mal irgendwo lief, dann sollte die Migration-Datei nicht mehr angefasst werden.
+Wenn man eine fehlerhafte Migation-Datei lokal ausgeführt hat, sollte man hoffen, ein Backup der lokalen Daten zu haben.
+
+In einer einzigen Migration-Datei können beliebig viele SQL-Queries ausgeführt werden.
+Meistens werden Tabellen erstellt oder bearbeitet (zB Spalten oder Constraints ändern, hinzufügen, löschen etc), oder benötigte (Beispiel)Datensätze angelegt. Oder es werden automatisiert Einträge geändert, wenn sich die Business-Logik zum Beispiel entscheidet, dass ein Wert nicht mehr optional ist und dann alle NULL-Werte auf einen Default-Wert geändert werden.
+
+Jede Migration-Datei sollte eine abgeschlossene Aufgabe beinhalten, und entsprechend aus den dafür benötigten Queries bestehen, anstatt jede einzelne Query in eine eigene Datei zu stecken.
+
+Für diese Anleitung erstellen wir eine Migration-Datei, die uns die Datenbanktabelle für unsere Entity `Person` anlegt.
+Sie heißt `V1.000__CREATE_TABLE_PERSON.sql`, liegt in `src/main/resources/db/migration/` und sieht so aus:
+```sql
+CREATE TABLE person (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(255),
+    email VARCHAR(255),
+    age INT,
+    married BOOLEAN
+);
+```
+
+Für die Spalte `id` verwenden wir hier eigentlich den PostgresQL-Dialekt, von dem wir zwei tolle Features nutzen.
+Und da H2 mit dem PostgresQL-Dialekt klar kommt, können wir die Features auch gut nutzen:
+- `PRIMARY KEY` können wir direkt bei der Spaltenbezeichnung dazuschreiben, statt wie in normalem SQL am Ende einen `CONSTRAINT` extra zu deklarieren, bei dem wir den Spaltennamen angeben müssen
+- `BIGSERIAL` ist eigentlich der Datentyp `BIGINT` (Integer mit mehr Speicherplatz; ähnlich wie in Java ein `Long` das gleiche ist wie ein `Integer` mit mehr Speicherplatz), kombiniert mit der Funktionalität, dass Ids automatisch aufeinanderfolgend vergeben werden können
+
+In nativem H2-Dialekt sähe eine ähnliche Query so aus:
+```sql
+CREATE TABLE person (
+    id BIGINT GENERATED BY DEFAULT AS IDENTITY NOT NULL,
+    name VARCHAR(255),
+    email VARCHAR(255),
+    age INT,
+    married BOOLEAN,
+    CONSTRAINT pk_person PRIMARY KEY (id)
+);
+```
+
+Und bei gewöhnlichem SQL müsste man komplett von Hand die Sequenz erstellen.
+
+Jetzt haben wir mit Flyway eine Tabelle für die Entity `Person` erstellt und können diese befüllen.
+Für unsere Anleitung legen wir nicht mit Flyway weitere Personen an, sondern basteln uns gleich Endpunkte, die mit JPA Personen speichern und zurückgeben können.
+
+
+
+
+
+
+
 
 
   curl localhost:8080/person \
@@ -887,9 +1000,34 @@ public Person getPersonById(
 
 
 
-## 12) User-Authentication und Rollen / Berechtigungen (ohne Datenbankeinträge)
+## 12) Entity mit allen CRUD-Operationen
 
-## 12.a) Spring Default Login-Seite, Absicherung von Pfaden, hardcoded Users
+***TODO ALEX*** eine Beispielentity: Klasse, Repository, Service, Controller. Mit implementierten CRUD-Operationen mit JPA und den dazugehörigen Standardchecks, zunächst nur als JSON-Endpunkte, evtl auch mit Erwähnung von der Annotation `@RestController`
+
+
+
+## 13) Dateien und Methoden sauber und strukturiert ablegen
+
+***TODO ALEX*** Trennung Controller <-> Service <-> Repository <-> Entity und sonstige von Spring benötigte Klassen, damit nicht alles in einem Ordner liegt.
+
+
+
+## 14) Entities anzeigen, anlegen oder bearbeiten mit nur einem Thymeleaf-Template
+
+***TODO ALEX***
+
+
+
+## 15) User-Authentication und Rollen / Berechtigungen (ohne Datenbankeinträge)
+
+Wir stellen ein, welche Endpunkte unseres Backends nur noch nach erfolgreichem Login erreichbar sind.
+Dafür erstellen wir auch hardgecoded (also fest im Programmcode enthalten, nicht zB aus einer Datenbank geladen) testweise User mit verschiedenen Rollen.
+Mit diesen können wir uns dann auch einloggen, um die Funktionalität zu testen.
+
+Beachte, dass nach Durchführung dieses Kapitels deine Endpunkte eventuell nur noch nach erfolgreichem Login erreichbar sind und ein einfacher `curl`-Befehl dann nicht mehr funktionieren wird!
+
+
+## 15.a) Spring Default Login-Seite, Absicherung von Pfaden, hardcoded Users
 
 Vieles aus diesem Unterkapitel findet sich auch bei Baeldung gut aufgeschrieben: [Spring Security Form Login](https://www.baeldung.com/spring-security-login)
 
@@ -923,6 +1061,8 @@ public class WebSecurityConfig {
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
+    // die Reihenfolge der folgenden Zeilen innerhalb von authorizeHttpRequests ist sehr wichtig. Was zuerst kommt, wird nicht mehr überschrieben. D.h. wenn man in der ersten Zeile den Zugang zu bestimmten Seiten ermöglicht oder verbietet, dann wird das keine der kommenden Zeilen mehr ändern können.
     http.authorizeHttpRequests((requests) -> requests
           // .requestMatchers("/welcome").permitAll() // der Pfad "/welcome" ist für alle erlaubt, auch für nicht-eingeloggte User
           // .requestMatchers("/welcome/**").permitAll() // alle Pfade, die mit "/welcome" anfangen, sind für alle erlaubt, auch für nicht-eingeloggte User
@@ -950,7 +1090,7 @@ public class WebSecurityConfig {
     return http.build();
   }
 
-  // im folgenden Code erstellen wir hardgecoded zwei User. Einen mit Rolle "USER" und einen mit Rolle "ADMIN", jeweils mit passendem Username und Passwort. Hier können wir zum Rumprobieren User erstellen. Bei einem echten Projekt müssten wir diese Infos in einer Datenbank speichern.
+  // im folgenden Code erstellen wir hardgecoded zwei User. Einen mit Rolle "USER" und einen mit Rolle "ADMIN", jeweils mit passendem Username und Passwort. Die Rollenbezeichnungen können wir beliebig wählen. Hier können wir zum Rumprobieren User erstellen. Bei einem echten Projekt müssten wir diese Infos in einer Datenbank speichern.
   @Bean
   public UserDetailsService userDetailsService() {
     UserDetails user = User
@@ -968,6 +1108,7 @@ public class WebSecurityConfig {
     return new InMemoryUserDetailsManager(user, admin);
   }
 
+  // das brauchen wir auch noch, damit die Passwörter ordentlich gehasht werden beim Erstellen und beim Login
   @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
@@ -985,7 +1126,7 @@ Man kann sie zB nutzen, um in einem Thymeleaf-Template entsprechende Meldungen a
 
 
 
-### 12.b) `@PreAuthorize` für Rollenprüfung auf Methodenlevel
+### 15.b) `@PreAuthorize` für Rollenprüfung auf Methodenlevel
 
 Hier eine gute Dokumentationsseite zum Thema für mehr Details: https://docs.spring.io/spring-security/reference/servlet/authorization/method-security.html#method-security-architecture
 
@@ -993,9 +1134,11 @@ Wenn wir zu unserer mit `@Configuration` annotierten Klasse `WebSecurityConfig` 
 
 Dafür setzen wir als Annotation an den Kopf einer Klasse oder Methode zB so eine Zeile: `@PreAuthorize("hasRole('ADMIN')")`
 
+***TODO ALEX*** checken ob man dann parallel noch `@EnableWebSecurity` nutzen kann, oder ob nur eins davon geht.
 
 
-### 12.c) Spring Security in Thymeleaf
+
+### 15.c) Spring Security in Thymeleaf
 
 Da das Template noch im Backend zu HTML umgewandelt wird (also Server-Side-Rendering), ist es nicht verwerflich, direkt im Thymeleaf-Template basierend auf dem Login des Users noch Sachen anzuzeigen oder nicht anzuzeigen.
 In einem JavaScript Frontend, oder sonstigem beim User zusammengebauten Frontend, sollte man das natürlich niemals tun.
@@ -1006,7 +1149,7 @@ Hier sind zwei gute kurze Artikel dazu, mit Beispielen:
 
 
 
-### 12.d) Für weitere Recherche?
+### 15.d) Für weitere Recherche?
 
 Ein guter Link von der offiziellen Spring Seite zur Einführung in die Basics, ähnlich wie hierüber in der Anleitung: https://spring.io/guides/gs/securing-web
 
@@ -1016,6 +1159,11 @@ https://www.baeldung.com/spring-enablewebsecurity-vs-enableglobalmethodsecurity
 Hier gibt es richtig viel für alle möglichen Funktionalitäten, die man sich wünschen kann (wurde nicht überprüft, ob das funktioniert, sieht aber gut aus, wenn auch eher veraltet):
 https://www.geeksforgeeks.org/spring-security-tutorial/
 
+
+
+## 16) User (auch mit anderen Feldern) in der Datenbank
+
+***TODO ALEX*** User speichern und auch beim Login aus Datenbank auslesen.
 
 
 
