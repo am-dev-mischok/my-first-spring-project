@@ -924,9 +924,11 @@ public class WebSecurityConfig {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http.authorizeHttpRequests((requests) -> requests
-            // .requestMatchers("/welcome").permitAll() // alle Pfade, die mit "/welcome" anfangen, sind für alle erlaubt, auch für nicht-eingeloggte User
-            // .requestMatchers("/manage/**").hasRole("ADMIN") // alle Pfade, die mit "/manage" anfangen, sind nur für User mit Rolle "ADMIN" erreichbar
-            .anyRequest().authenticated() // alle anderen Pfade sind nur mit erfolgreichem Login erreichbar
+          // .requestMatchers("/welcome").permitAll() // der Pfad "/welcome" ist für alle erlaubt, auch für nicht-eingeloggte User
+          // .requestMatchers("/welcome/**").permitAll() // alle Pfade, die mit "/welcome" anfangen, sind für alle erlaubt, auch für nicht-eingeloggte User
+          // .requestMatchers("/manage/**").hasRole("ADMIN") // alle Pfade, die mit "/manage" anfangen, sind nur für User mit Rolle "ADMIN" erreichbar
+          // .requestMatchers("/manage/**").hasAnyRole("ADMIN", "TEACHER") // alle Pfade, die mit "/manage" anfangen, sind nur für User mit Rolle "ADMIN" oder "TEACHER" erreichbar
+          .anyRequest().authenticated() // alle anderen Pfade sind nur mit erfolgreichem Login erreichbar
     );
 
     // erstellt eine Standard-Login-Seite (im Bootstrap-Design) unter dem Pfad "/login" und leitet nicht-eingeloggte User, die sich einloggen müssen, automatisch dorthin. Außerdem hat diese Seite eine rote Meldung bei fehlgeschlagenen Logins. Zusätzlich gibt es durch diese Zeile unter dem Pfad "/logout" eine Seite mit einem Knopf zum ausloggen. Vorsicht!: dieser Logout-Knopf leitet zwar wieder zu "/login", aber der User ist noch nicht wirklich ausgeloggt. Für diese Funktionalität braucht man noch die Zeile http.logout(configurer -> configurer.invalidateHttpSession(true));
@@ -975,10 +977,10 @@ public class WebSecurityConfig {
 
 Die folgenden vordefinierten Weiterleitungen gibt es mit den oberen Einstellungen, wenn man sie nicht selbst überschreibt.
 Man kann sie zB nutzen, um in einem Thymeleaf-Template entsprechende Meldungen anzuzeigen:
-- bei falschem Login: "/login?error"
-- bei erfolgreichem Login: Der aufgerufende Pfad, dazu "?continue".
-  Wenn der Pfad zur Login-Seite aufgerufen wurde, landet man beim leeren Pfad (immer noch mit "?continue")
-- bei Logout: "/login?logout"
+- bei falschem Login: `"/login?error"`
+- bei erfolgreichem Login: Der aufgerufende Pfad, dazu `"?continue"`.
+  Wenn der Pfad zur Login-Seite aufgerufen wurde, landet man beim leeren Pfad (immer noch mit `"?continue"`)
+- bei Logout: `"/login?logout"`
 
 
 
