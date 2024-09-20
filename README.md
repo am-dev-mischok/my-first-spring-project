@@ -891,6 +891,8 @@ public Person getPersonById(
 
 ## 12.a) Spring Default Login-Seite, Absicherung von Pfaden, hardcoded Users
 
+Vieles aus diesem Unterkapitel findet sich auch bei Baeldung gut aufgeschrieben: [Spring Security Form Login](https://www.baeldung.com/spring-security-login)
+
 In unserer `pom.xml` fügen fügen wir folgendes ein, um ***Spring Boot Starter Security*** nutzen zu können:
 ```xml
 <dependency>
@@ -942,29 +944,40 @@ public class WebSecurityConfig {
     return http.build();
   }
 
-  // im folgenden Code erstellen wir hardgecoded zwei User. Einen mit Rolle "USER" und einen mit Rolle "ADMIN", jeweils mit passendem Username und Passwort. Hier können wir zum Rumprobieren User erstellen. Bei einem echten projekt müssten wir diese Infos in einer Datenbank speichern.
+  // im folgenden Code erstellen wir hardgecoded zwei User. Einen mit Rolle "USER" und einen mit Rolle "ADMIN", jeweils mit passendem Username und Passwort. Hier können wir zum Rumprobieren User erstellen. Bei einem echten Projekt müssten wir diese Infos in einer Datenbank speichern.
   @Bean
   public UserDetailsService userDetailsService() {
-    @SuppressWarnings("deprecation")
-    UserDetails user =
-        User.withDefaultPasswordEncoder()
-            .username("user")
-            .password("user")
-            .roles("USER")
-            .build();
+    UserDetails user = User
+        .withUsername("user")
+        .password(passwordEncoder().encode("user"))
+        .roles("USER")
+        .build();
 
-    @SuppressWarnings("deprecation")
-    UserDetails admin =
-        User.withDefaultPasswordEncoder()
-            .username("admin")
-            .password("admin")
-            .roles("ADMIN")
-            .build();
+    UserDetails admin = User
+        .withUsername("admin")
+        .password(passwordEncoder().encode("admin"))
+        .roles("ADMIN")
+        .build();
 
     return new InMemoryUserDetailsManager(user, admin);
   }
+
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
 }
 ```
+
+Die folgenden vordefinierten Weiterleitungen gibt es mit den oberen Einstellungen, wenn man sie nicht selbst überschreibt.
+Man kann sie zB nutzen, um in einem Thymeleaf-Template entsprechende Meldungen anzuzeigen:
+- bei falschem Login: "/login?error"
+- bei erfolgreichem Login: Der aufgerufende Pfad, dazu "?continue".
+  Wenn der Pfad zur Login-Seite aufgerufen wurde, landet man beim leeren Pfad (immer noch mit "?continue")
+- bei Logout: "/login?logout"
+
+
+
 
 ### 12.b) `@PreAuthorize` für Rollenprüfung auf Methodenlevel
 
@@ -976,15 +989,26 @@ Dafür setzen wir als Annotation an den Kopf einer Klasse oder Methode zB so ein
 
 
 
-### 12.c) Für weitere Recherche
+### 12.c) Spring Security in Thymeleaf
 
-Hier gibt es richtig viel für alle möglichen Funktionalitäten, die man sich wünschen kann (wurde nicht überprüft, ob das funktioniert, sieht aber gut aus):
-https://www.geeksforgeeks.org/spring-security-tutorial/
+Da das Template noch im Backend zu HTML umgewandelt wird (also Server-Side-Rendering), ist es nicht verwerflich, direkt im Thymeleaf-Template basierend auf dem Login des Users noch Sachen anzuzeigen oder nicht anzuzeigen.
+In einem JavaScript Frontend, oder sonstigem beim User zusammengebauten Frontend, sollte man das natürlich niemals tun.
+
+Hier sind zwei gute kurze Artikel dazu, mit Beispielen:
+- [Spring Security with Thymeleaf](https://www.baeldung.com/spring-security-thymeleaf)
+- [Thymeleaf + Spring Security integration basics](https://www.thymeleaf.org/doc/articles/springsecurity.html)
+
+
+
+### 12.d) Für weitere Recherche?
 
 Ein guter Link von der offiziellen Spring Seite zur Einführung in die Basics, ähnlich wie hierüber in der Anleitung: https://spring.io/guides/gs/securing-web
 
 Von Baeldung auch einer zu den Basics:
 https://www.baeldung.com/spring-enablewebsecurity-vs-enableglobalmethodsecurity
+
+Hier gibt es richtig viel für alle möglichen Funktionalitäten, die man sich wünschen kann (wurde nicht überprüft, ob das funktioniert, sieht aber gut aus, wenn auch eher veraltet):
+https://www.geeksforgeeks.org/spring-security-tutorial/
 
 
 
