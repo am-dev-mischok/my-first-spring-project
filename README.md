@@ -7,14 +7,15 @@ Entstanden im Rahmen vom Modul "Software-Architektur 1" in der Mischok Academy.
 ## 0) Einleitung
 
 ### 0.a) Für Dozierende und Wiederholungstäter
-Der YouTuber *Amigoscode* gibt es ein ganz nettes, fixes, nur 97-minütiges Video [Spring Boot Tutorial | Full Course [2023] [NEW]](https://www.youtube.com/watch?v=9SGDpanrc8U), in dem er mit nur wenigen Unterschieden zur Vorgehensweise aus der folgenden Anleitung die Basics erklärt.
+Beim YouTuber *Amigoscode* gibt es ein ganz nettes, fixes, nur 97-minütiges Video [Spring Boot Tutorial | Full Course [2023] [NEW]](https://www.youtube.com/watch?v=9SGDpanrc8U), in dem er mit nur wenigen Unterschieden zur Vorgehensweise aus der folgenden Anleitung die Basics erklärt.
 Wer schon die Grundlagen von Spring mal gesehen hat, ist dort gut aufgehoben.
 Im Video werden aber weniger Sachen behandelt, als in dieser Anleitung.
-Das hier sind alle Unterschiede, die ich beim ersten Erstellen der Anleitung (Alex, September 2024) beim schnellen Anschauen gesehen habe:
+Das hier sind alle Unterschiede, die ich beim ersten Erstellen der Anleitung (Alex, September 2024) beim schnellen Anschauen gesehen habe.
+Im Video nicht bearbeitete Konzepte stehen nicht in dieser Liste:
 - benutzt nicht ***Lombok***, aber erwähnt es
 - benutzt nicht ***Flyway***
 - Datenbank mit ***Postgres***, nicht mit ***H2***
-  - erstellt in Postgres CLI eine Datenbank, gibt dann dem eigenen User alle Rechte, dessen Authentication er in die application.properties legt?? (vor 40:00)
+  - erstellt in Postgres CLI eine Datenbank, gibt dann dem eigenen User alle Rechte, dessen Authentication er in die `application.properties` legt?? (vor 40:00)
 - benutzt **kein Thymeleaf**, als Rückgabe **nur JSON**
   - Controller-Klasse mit `@RestController`, statt `@Controller`, sodass man sich bei JSON-Rückgabe bei den Endpunkten die Annotation `@ResponseBody` sparen kann (wird bei Thymeleaf-Rückgabe evtl stören)
   - am Anfang schreibt er einen GET-Endpunkt mit den nötigen Annotations direkt bei der Klasse mit `main` rein, lagert das aber später in eigene Klasse aus
