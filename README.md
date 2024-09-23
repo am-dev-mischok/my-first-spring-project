@@ -57,6 +57,7 @@ Folgende Funktionalitäten werden wir haben:
   - **HTML** und **CSS** Grundlagen
   - ***Terminal*** in einem Ordner öffnen und keine Angst davor haben
   - optional: ***git*** installiert und Grundlagen dafür gelernt, um nach jedem Schritt (oder nach wenigen Schritten) einen schönen neuen Commit anzulegen
+    - am Ende dieser Anleitung, im [Anhang](#appendix), gibt es einen [Refresher](#appendix-git) zu git
 - Betriebssystem: ***Ubuntu*** wäre gut
 - im Terminal installierte/verfügbare Programme:
   - **mvn**
@@ -731,6 +732,8 @@ curl -X POST \
 
 Hier ist der Link zur Dokumentation von Thymeleaf bezüglich Forms: https://www.thymeleaf.org/doc/tutorials/2.1/thymeleafspring.html#creating-a-form
 
+***TODO ALEX*** Beispiel
+
 In einem späteren Kapitel basteln wir ein Thymeleaf-Template, in dem die Eingabefelder durch Daten aus einer bestehenden Entity (teilweise) vorausgefüllt sind.
 Dieses eine Template können wir dann verwenden, um neue Entities zu erstellen, existierende zu bearbeiten, und existierende im Detail anzuzeigen.
 Also drei Funktionen in einem Template!
@@ -767,9 +770,10 @@ Wir fügen in der `pom.xml` folgendes in den `<dependencies>`-Tag ein:
     <artifactId>spring-boot-starter-data-jpa</artifactId>
   </dependency>
   ```
-  - **Achtung**: Die von uns eingebundene Dependency [Spring Boot Starter Data JPA](https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa) ist nicht das gleiche, wie [Spring Data JPA](https://mvnrepository.com/artifact/org.springframework.data/spring-data-jpa), stelle unbedingt sicher, dass du die richtige Dependency hast!
+  - **Achtung**: Die von uns eingebundene Dependency [Spring Boot Starter Data JPA](https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa) ist nicht das gleiche, wie [Spring Data JPA](https://mvnrepository.com/artifact/org.springframework.data/spring-data-jpa).
+  Stelle unbedingt sicher, dass du die richtige Dependency hast!
 
-Wenn wir jetzt unser Programm starten (wie immer im Terminal mit `./mvnw spring-boot:run` oder über den Play-Button in IntelliJ), gibt es einen Fehler:
+Wenn wir jetzt unser Programm starten (wie immer zB im Terminal mit `./mvnw spring-boot:run` oder über den Play-Button in IntelliJ), gibt es einen Fehler:
   ```
   Error creating bean with name 'entityManagerFactory' [...]
   ```
@@ -785,13 +789,20 @@ Sieht dann zum Beispiel so aus als neue Dependency in unserer `pom.xml`:
   <artifactId>h2</artifactId>
 </dependency>
 ```
-- falls bisher noch nicht erwähnt: wenn wir uns die Dependency online holen, wird direkt unter dem `<version>`-Tag wahrscheinlich noch ein `<scope>test</scope>` stehen.
-  Hier wird festgelegt, in welchem Scope diese Dependency zur Verfügung stehen soll.
-  Damit wollen wir uns aktuell nicht auseinander setzen, also können wir die Zeile auch weglassen.
-  Mehr Infos: [Baeldung -- Maven Dependency Scopes](https://www.baeldung.com/maven-dependency-scopes)
+- falls bisher noch nicht erwähnt:
+  - wenn wir uns die Dependency online holen, wird direkt unter dem `<artifactId>`-Tag wahrscheinlich noch ein `<version>`-Tag stehen.
+    Spring erwartet teilweise bestimmte Versionsnummern, weswegen es meistens empfehlenswert ist, die Versionszeile wegzulassen.
+    Spring entscheidet dann, welche Version genommen werden soll.
+    - Dieser Stichpunkt könnte gefährliches Halbwissen sein.
+      Für echte Projekte vielleicht selbst nochmal einlesen 👀
+      Zumindest wenn man hier bei H2 eine der neueren Versionen explizit angibt, funktioniert es nicht.
+  - außerdem gibt es oft noch eine Zeile mit einem `<scope>`-Tag, wie `<scope>test</scope>`
+    Hier wird festgelegt, in welchem Scope diese Dependency zur Verfügung stehen soll.
+    Damit wollen wir uns aktuell nicht auseinandersetzen, also können wir die Zeile auch weglassen.
+    Mehr Infos: [Baeldung -- Maven Dependency Scopes](https://www.baeldung.com/maven-dependency-scopes)
 
 Spring setzt bei H2 automatisch Default-Werte.
-Diese Setzen wir aber trotzdem noch manuell, weil wir sie gleich direkt noch anpassen möchten.
+Diese setzen wir aber trotzdem noch manuell, weil wir sie gleich direkt noch anpassen möchten.
 Und auch damit wir ein Gefühl für solche Konfigurationen bekommen.
 Dafür kopieren wir folgende Zeilen in die Datei `application.properties`:
   ```
@@ -801,7 +812,8 @@ Dafür kopieren wir folgende Zeilen in die Datei `application.properties`:
   spring.datasource.password=
   ```
   - die letzte Zeile hat einen leeren Wert, damit das Passwort leer bleibt und wir kein Passwort eingeben müssen.
-    Für die lokale Entwicklung ist das praktisch.
+    Für die lokale Entwicklung ist das praktisch, sollte aber bei der Konfiguration für online liegende Datenbanken unbedingt geändert werden.
+    Mehr Infos zu Konfigurationen in Spring abhängig vom Kontext, bzw zum Spring-Konzept der **Profiles**: https://www.baeldung.com/spring-profiles#profiles-in-spring-boot
 
 #### 10.b.III) H2: Modus wechseln von In-Memory zu File
 Mit diesen Default-Werten läuft die H2-Datenbank im **In-Memory**-Mode.
@@ -830,7 +842,7 @@ Und hier sieht man, wie es nach dem Login aussieht, wenn man links bei "PERSON" 
 Zu Demonstrationszwecken wurde hier vorab ein Eintrag erstellt.
 Dieser sollte jetzt noch nicht existieren, wenn man nur diese Anleitung bis hierher befolgt hat.
 
-![Screenshot von der H2-Console](images/h2-console-login.png "Screenshot von der H2-Console")
+![Screenshot von der H2-Console](images/h2-console-select.png "Screenshot von der H2-Console")
 
 
 ##### Ausblick:  
@@ -1168,7 +1180,11 @@ https://www.geeksforgeeks.org/spring-security-tutorial/
 
 
 
+<span id="appendix"></span>
+
 # Anhang
+
+<span id="appendix-git"></span>
 
 ## A) git, ein knapper Refresher
 
