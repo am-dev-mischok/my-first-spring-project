@@ -5,7 +5,7 @@ Entstanden im Rahmen vom Modul "Software-Architektur 1" in der Mischok Academy.
 
 <!-- this adds a Table of Contents in gitlab flavored markdown, but does not work on github. -->
 
-[[_TOC_]]
+<!-- [[_TOC_]] -->
 
 
 ## 0) Einleitung
