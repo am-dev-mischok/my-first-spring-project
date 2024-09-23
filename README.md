@@ -913,13 +913,63 @@ Außerdem haben wir auch noch kein Repository, das uns die Queries ausführt (OR
 Aber selbst wenn wir bereits passende POST-Endpunkte hätten und ein für JPA eingerichtetes Repository, bräuchten wir passende Tabellen in der Datenbank.
 Diese können (oder "sollten") wir nicht durch Endpunkte anlegen lassen, da sonst unsere ganze Spring [MVC](https://de.wikipedia.org/wiki/Model_View_Controller)-Struktur verkompliziert oder unmöglich gemacht wird.
 
-Was wir also brauchen, 
+Glücklicherweise legt uns JPA bei H2 im In-Memory Mode die Tabellen automatisch an.
+Im File Mode aber nicht mehr.
+Was ist passiert?
+Da dieses Verhalten von JPA fehleranfällig ist und nur für schnelles Rumprobieren gedacht ist, genau wie der In-Memory Mode von H2, wird dieses Verhalten standardmäßig deaktiviert, wenn wir H2 im File Mode betreiben.
+Um dieses Verhalten aber auch im File Mode zu haben, können wir folgende Zeile in unserer `application.properties` setzen:
+```
+spring.jpa.generate-ddl=true # <- mit dieser Property erstellt JPA die DB-Tabellen für uns
+```
 
-Auch nichts, was ich empfehle, aber anscheinend kann man bei Spring beim Ausführen des Programmes Code ausführen mit der `CommandLineRunner` Bean, und so direkt beim Start ein paar Datensätze mit JPA (oder auch klassisch mit JDBC und selbstgeschriebenen Queries) anlegen. Mehr Infos hier: https://spring.io/guides/gs/accessing-data-jpa#_create_an_application_class
+Wenn wir jetzt noch fix unsere Repositories für JPA bereits implementiert hätten, könnten wir also auch anfängliche Datenbankeinträge anlegen, wenn wir sie brauchen (wie zB erste User).
+Oder wir könnten sie auch mit direkter Verbindung (zB JDBC) als Queries anlegen.
+
+Bei Spring gibt es eine Möglichkeit, bei Programmstart Code auszuführen.
+Dafür müssen wir nur eine `CommandLineRunner` Bean erstellen, zum Beispiel direkt unter unserer `main`.
+Im folgenden Beispiel ein paar Experimente, die dieser ANleitung vorausgingen:
+```java
+@SpringBootApplication
+public class MyFirstSpringProjectApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(MyFirstSpringProjectApplication.class, args);
+	}
+
+
+	@Bean
+	public CommandLineRunner demo(PersonRepository personRepository) {
+		return (args) -> {
+			System.out.println("Hallöchen");
+			System.out.println(personRepository.count());
+//			personRepository.save(Person.builder().name("Mäxchen").build());
+//
+//			personRepository.deleteById(1L);
+//
+//			personRepository.save(Person.builder().name("Paul").build());
+//			System.out.println(personRepository.count());
+//
+//			List<Person> persons = personRepository.findAll();
+//			for (Person person : persons) {
+//				System.out.println(person.getId() + ", " + person.getName());
+//			}
+		};
+	}
+}
+```
+
+Dieses Vorgehen findet auch in einem viel zu knappen Tutorial von Spring Erwähnung: https://spring.io/guides/gs/accessing-data-jpa#_create_an_application_class
+
+#### 10.b.II) Optionaler Abschweifer: Unkontrolliertes SQL-Skript ausführen lassen
+
+```
+#spring.sql.init.mode=always # <- wenn wir nicht Flyway benutzen wollen, sondern unsere Daten in resources/templates/data.sql erstellen wollen, aber unsere H2-DB als File haben, dann brauchen wir diese Property, damit Springdie Queries ausführt
+```
 
 TODO ALEX finish
 
-#### 10.c) Flyway zum Anlegen initialer Tabellen und Datensätze, sowie zum späteren Ändern des DB-Schemas
+
+#### 10.c) Flyway zum Anlegen initialer Tabellen und Datensätze, sowie zum späteren Ändern des DB-Schemas oder sonstigen Queries
 
 Kommen wir zu einer schöneren Methode, die auch besonders empfehlenswert ist.
 Und zwar die Nutzung eines DB-Migration Tools wie ***Flyway*** oder ***Liquibase***.
@@ -995,6 +1045,11 @@ CREATE TABLE person (
 );
 ```
 
+**Achtung!**: zumindest beim Rumprobieren für diese Anleitung, aber generell auch oft bei Datenbanken, gibt es häufig Probleme, wenn man eine Tabelle mit Namen `user` erstellen will.
+Häufig wird eine Tabelle mit diesem Namen eingerichtet, um Zugriffsberechtigungen zur Datenbank zu verwalten.
+Um User vom eigenen Programm zu speichern, kann man eine Tabelle zB mit Namen `application_user`, `app_user`, `system_user`, `my_user`, `custom_user` oder mit sonstigen Zusätzen im Namen anlegen.
+Auch die Entity-Klasse kann bei so einer Benennung besser auseinandergehalten werden von `org.h2.engine.User` `org.apache.catalina.User` oder `org.springframework.security.core.userdetails.User` (alles mögliche Imports beim Projekt dieser Anleitung).
+
 Für die Spalte `id` verwenden wir hier eigentlich den PostgresQL-Dialekt, von dem wir zwei tolle Features nutzen.
 Und da H2 mit dem PostgresQL-Dialekt klar kommt, können wir die Features auch gut nutzen:
 - `PRIMARY KEY` können wir direkt bei der Spaltenbezeichnung dazuschreiben, statt wie in normalem SQL am Ende einen `CONSTRAINT` extra zu deklarieren, bei dem wir den Spaltennamen angeben müssen
@@ -1017,18 +1072,7 @@ Und bei gewöhnlichem SQL müsste man komplett von Hand die Sequenz erstellen.
 Jetzt haben wir mit Flyway eine Tabelle für die Entity `Person` erstellt und können diese befüllen.
 Für unsere Anleitung legen wir nicht mit Flyway weitere Personen an, sondern basteln uns gleich Endpunkte, die mit JPA Personen speichern und zurückgeben können.
 
-
-
-
-
-
-
-
-
-  curl localhost:8080/person \
-      -X POST \
-      -H 'Content-Type: application/json' \
-      -d '{ "name":"Paul", "email":"paul@example.com", "married": true}'
+TODO ALEX
 
 
 
