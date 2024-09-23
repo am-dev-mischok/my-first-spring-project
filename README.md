@@ -3,7 +3,7 @@
 Das hier ist eine Schritt-für-Schritt-Anleitung für die Erstellung eines ersten [Spring](https://spring.io/) Backends.
 Entstanden im Rahmen vom Modul "Software-Architektur 1" in der Mischok Academy.
 
-<!-- this adds a Table of Contents in github (and gitlab) flavored markdown. -->
+<!-- this adds a Table of Contents in gitlab flavored markdown, but does not work on github. -->
 
 [[_TOC_]]
 
