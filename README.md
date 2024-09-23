@@ -831,7 +831,7 @@ Wenn wir jetzt unser Programm starten (wie immer zB im Terminal mit `./mvnw spri
   ```
   - kurz gesagt: Spring findet keine Datenbank, also erstellen wir eine
 
-#### 10.b.II) H2-Datenbank einbinden
+#### 10.a.II) H2-Datenbank einbinden
 
 Mit Maven binden wir ganz einfach H2 ein.
 Sieht dann zum Beispiel so aus als neue Dependency in unserer `pom.xml`:
@@ -867,7 +867,7 @@ Dafür kopieren wir folgende Zeilen in die Datei `application.properties`:
     Für die lokale Entwicklung ist das praktisch, sollte aber bei der Konfiguration für online liegende Datenbanken unbedingt geändert werden.
     Mehr Infos zu Konfigurationen in Spring abhängig vom Kontext, bzw zum Spring-Konzept der **Profiles**: https://www.baeldung.com/spring-profiles#profiles-in-spring-boot
 
-#### 10.b.III) H2: Modus wechseln von In-Memory zu File
+#### 10.a.III) H2: Modus wechseln von In-Memory zu File
 Mit diesen Default-Werten läuft die H2-Datenbank im **In-Memory**-Mode.
 Das heißt, dass die Datenbank bei jedem Programmstart neu erzeugt wird und beim Herunterfahren des Programms auch wieder gelöscht wird.
 Stattdessen können wir die Datei aber auch als Datei erstellt bekommen, im **File**-Mode.
@@ -882,7 +882,7 @@ Für diese Anleitung stellen wir es so ein:
 **Tipp**: in die `.gitignore` die Zeile `data/` einfügen, damit die DB-Datei nicht commited wird und die lokalen Testdaten damit auch lokal bleiben, statt damit den Speicherplatz auf Github (oder Gitlab) zu vermüllen.
 
 
-#### 10.b.IV) H2-Console
+#### 10.a.IV) H2-Console
 
 Mit dem Modus umgestellt zu File, können wir die H2-Console nutzen, um unsere Datenbank zu sehen und Queries auszuführen.
 Die H2-Console ist (wenn man die Default-Werte nicht extra geändert hat) verfügbar unter `localhost:8080/h2-console`, während unser Programm läuft.
