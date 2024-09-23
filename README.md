@@ -547,6 +547,8 @@ Die beiden GET-Requests können wir folgendermaßen im Terminal mit `curl` ausf�
 ```
 curl localhost:8080
 
+curl localhost:8080 -X GET
+
 curl localhost:8080/greeting -H "accept: text/html"
 curl localhost:8080/greeting -H "accept: application/json"
 
@@ -559,8 +561,9 @@ curl localhost:8080/greeting -H "accept: application/json"
 curl 'localhost:8080/greeting?name=Alex&css=style-alex' -H "accept: text/html"
 curl localhost:8080/greeting?name=Paul -H "accept: application/json"
 ```
-
-Beim vorletzten `curl`-Befehl sind die String-Delimiter beim Pfad wichtig, da sonst das `&`-Zeichen im Pfad zu Problemen führt.
+  - mit der Flag `-X` können wir das HTTP-Verb festlegen, aber da `GET` der Default ist, kann man sich das hier auch sparen.
+  - mit der Flag `-H` können wir Request-Headers setzen
+  - beim vorletzten `curl`-Befehl sind die String-Delimiter beim Pfad wichtig, da sonst das `&`-Zeichen im Pfad zu Problemen führt.
 
 **Tipp**: wenn du einen langen Befehl im Terminal übersichtlicher schreiben willst, kannst du auch im Terminal mehrere Zeilen nutzen.
 Wenn du `\` eingibst und dann `Enter` (Taste für neue Zeile) drückst, dann wird der Befehl nicht ausgeführt, sondern eine neue Zeile gestartet.
@@ -609,6 +612,7 @@ Dafür brauchen wir nur statt `@GetMapping` ein `@PostMapping` und außerdem noc
   @ResponseBody
   public Person createPersonFromJson(@RequestBody Person person) {
       // hier sollten wir die Person speichern, aber wir haben noch keine Datenbank
+      System.out.println("eine Person wurde als JSON-Objekt mitgeschickt, kann das sein?");
       System.out.println(person.getId());
       System.out.println(person.getName());
       System.out.println(person.getEmail());
@@ -621,18 +625,23 @@ Dafür brauchen wir nur statt `@GetMapping` ein `@PostMapping` und außerdem noc
   ```
 - mit curl Testen, Infos im JSON-Body mitschicken
   ```
-  curl -H 'Content-Type: application/json' \
+  curl -X POST \
+    -H 'Content-Type: application/json' \
     -d '{ "name":"Paul", "email":"paul@example.com", "age":"25", "married": true}' \
-    -X POST \
     localhost:8080/person
   ```
-
+  - mit der Flag `-d` können wir den Body setzen.
+    Wenn man `-d` benutzt, macht `curl` immer einen POST-Request, sodass wir `-X POST` weglassen könnten.
+    Solche Default-Shortcuts sollte man immer nur vorsichtig einsetzen.
 
 
 ## 9) HTML-Form für GET- und POST-Requests
 Die Daten, die wir mit einem Request mitschicken, wollen wir aus einer Eingabe vom User nehmen.
 
 ### 9.a) Ohne Thymeleaf, nur HTML
+
+#### 9.a.I) GET-Request mit HTML-Form
+
 Da es bei einem GET-Request keinen Body gibt, werden die Eingaben als Key-Value-Pairs (oder hier treffender: Name-Value-Pairs) in die Request-Parameter hinter den Pfad gehängt.
 
 Fügen wir die folgende HTML-Form in unsere `index.html` ein, dann kann der User den anzuzeigenden Namen eintippen und die anzuzeigende CSS auswählen.
@@ -645,7 +654,7 @@ Probiere es aus und schaue nach, wie nach Abschicken des Formulars der Request i
 <form action="/greeting" method="GET">
   <div>
     <label for="userInput">Dein Name?</label>
-    <input name="n" id="userInput" placeholder="Gib deinen Namen ein" />
+    <input name="n" id="userInput" type="text" placeholder="Gib deinen Namen ein" />
   </div>
   <div>
     <label for="styling">Styling?</label>
@@ -665,20 +674,30 @@ Probiere es aus und schaue nach, wie nach Abschicken des Formulars der Request i
 </form>
 ```
 
-Für einen POST-Request müssen wir das Attribut `method` anpassen.
+Mit diesem Formular können wir ganz einfach den Namen eingeben in das Textfeld (erstellt durch `<input type="text">`) und das Styling auswählen im Dropdown (`<select>` mit passenden Auswahlmöglichkeiten `<option>`) und durch einen Klick auf den `<button>` wird der GET-Request richtig formatiert für uns abgeschickt und wir sehen unsere gewohnte Greeting-Seite.
+
+
+#### 9.a.II) POST-Request mit HTML-Form
+
+Für einen POST-Request müssen wir beim `<form>`-Tag das Attribut `method` anders setzen.
 Und in unserem Fall auch den Pfad, da wir unter `/greeting` keinen POST-Request haben.
+Stattdessen basteln wir uns gleich einen POST-Request unter dem Pfad `/person`, der von einem Formular aus benutzbar ist.
+
+Damit unser Projekt übersichtlich bleibt, verändern wir nicht unser Berüßungs-Formular vom letzten Unterunterkapitel, sondern erstellen zu unserem POST-Request auch ein neues Formular.
 
 Beim POST-Request werden die Inputs leider nicht direkt als JSON-Objekt im Body mitgesendet, sondern wie beim GET-Request eigentlich in der URL.
-Die Annotation `@RequestBody` brauchen wir deswegen nicht mehr.
+Die Annotation `@RequestBody` brauchen wir deswegen für den folgenden neuen Endpunkt nicht mehr.
 Spring wandelt die Daten in der URL dann ohne Annotation zu unserem POJO um.
 
-Ähnlich wie bei den beiden GET-Requests mit dem gleichen Pfad, können wir auch hier wieder den gleichen Pfad nutzen.
-Dann müssen wir aber in der Annotation `@PostMapping` den Wert `consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE` setzen.
+Da wir schon einen POST-Endpunkt unter dem Pfad `/person` haben, können wir ähnlich wie bei den beiden GET-Requests mit dem gleichen Pfad vorgehen und auch hier wieder den gleichen Pfad nutzen.
+Dafür müssen wir nur in der Annotation `@PostMapping` den Wert `consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE` setzen.
+Wir haben also zwar wieder zwei Endpunkte mit dem gleichen Pfad, aber welcher davon aufgerufen wird, wird durch die Art der mitgeschickten Daten (bzw durch die dann hoffentlich korrekten Infos in den Headers bezüglich der mitgeschickten Daten) bestimmt.
 
 ```java
 @PostMapping(value = "/person", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 public String createPersonFromForm(Person person) {
     // hier sollten wir die Person speichern, aber wir haben noch keine Datenbank
+    System.out.println("ein Formular könnte diesen POST-Request aufgerufen haben, cool B)");
     System.out.println(person.getId());
     System.out.println(person.getName());
     System.out.println(person.getEmail());
@@ -719,20 +738,49 @@ public String createPersonFromForm(Person person) {
 </form>
 ```
 
-Den POST-Request, der von der Form abgeschickt wird, können wir folgendermaßen mit `curl` abschicken:
+Dieses Formular können wir jetzt direkt testen und im Terminal, in dem unser Programm läuft, sehen wir die abgeschickten Werde dank `System.out.println(...)`.
+Wenn man hier beim bei der Checkbox den Haken rauslässt, dann kommt beim Endpunkt nicht der Boolean `false` an, sondern `null`.
+Das ist bei HTML-Formularen leider so und deswegen sollte man irgendwo ab Empfang des Formulars (also im Endpunkt bzw in darin aufgerufenen Methoden) an passender Stelle ein `null` einer Checkbox umwandeln zu einem `false`.
+Auch bei manchen anderen Feldern, wie dem Zahleninput vom Alter, wird null abgeschickt, wenn nichts drinnen steht.
+Leere Textfelder schicken aber einen leeren String ab.
+
+#### 9.a.III) Formular-Request imitieren mit `curl`
+
+Den POST-Request, der von der Form abgeschickt wird, können wir bei Bedarf auch mit `curl` abschicken.
+Dafür müssen wir in den Headers den passenden `Content-Type` ankündigen.
+Den Body müssen wir, aufgrund der zu erwartenden Sonderzeichen, auf jeden Fall mit String-Delimitern (Apostroph "`'`") umschließen.
+Sonderzeichen (inklusive Leerzeichen) muss man nicht kodieren, kann man aber machen.
+Das geht in unserem Fall zB so:
 ```
 curl -X POST \
   -H 'Content-Type: application/x-www-form-urlencoded' \
-  -d 'name=Paul&email=paul%40example.com&age=25&married=on' \
+  -d 'name=Paul Heinz&email=paul_heinz@40example.de&age=24&married=on' \
   localhost:8080/person
 ```
+oder
+```
+curl -X POST \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -d 'name=Paul+Heinz&email=paul_heinz96%40example.de&age=24&married=on' \
+  localhost:8080/person
+```
+
+Bei GET-Requests müssen wir bedenken, dass Formularinhalte in der URL mitgeschickt werden.
+Der Befehl ist also eigentlich nichts neues:
+```
+curl -X GET \
+  -H 'accept: text/html' \
+  'localhost:8080/greeting?n=Paul+Heinz&css=style-alex'
+```
+  - wie schon letztes Mal, als wir mit `curl` GET-Endpunkte aufgerufen haben, setzen wir wieder im Header, dass wir `text/html` erwarten, damit uns nicht der JSON-zurückgebende GET-Endpunkt antwortet
+
 
 
 ### 9.b) Mit (möglichst wenig) Thymeleaf
 
 Hier ist der Link zur Dokumentation von Thymeleaf bezüglich Forms: https://www.thymeleaf.org/doc/tutorials/2.1/thymeleafspring.html#creating-a-form
 
-***TODO ALEX*** Beispiel
+***TODO ALEX*** Beispiel einfügen
 
 In einem späteren Kapitel basteln wir ein Thymeleaf-Template, in dem die Eingabefelder durch Daten aus einer bestehenden Entity (teilweise) vorausgefüllt sind.
 Dieses eine Template können wir dann verwenden, um neue Entities zu erstellen, existierende zu bearbeiten, und existierende im Detail anzuzeigen.
@@ -845,7 +893,7 @@ Dieser sollte jetzt noch nicht existieren, wenn man nur diese Anleitung bis hier
 ![Screenshot von der H2-Console](images/h2-console-select.png "Screenshot von der H2-Console")
 
 
-##### Ausblick:  
+##### Ausblick:
 Bei Bedarf, oder bei größeren Projekten, würden wir eine andere Datenbank benutzen, statt H2.
 Zum Beispiel eine ***Postgres***-Datenbank, die neben höherer Performance bei vielen Usern auch noch den SQL-Dialekt ***PostgresQL*** hat, welcher viele Features bietet, den normales SQL nicht hat.
 Bei H2 gibt es sogar die Möglichkeit, PostgresQL und andere SQL-Dialekte einzustellen, die dann von H2 imitiert werden.
@@ -857,8 +905,7 @@ Dieses Unterkapitel kann zum Verständnis und für die Arbeit mit verranztem Leg
 Es kann aber auch komplett übersprungen werden, wenn man weniger interessiert ist an nicht so gut funktionierenden, umständlicheren Lösungen.
 Im nächsten Unterkapitel werden wir stattdessen ordentlich mit ***Flyway*** initiale Tabellen und Daten anlegen und auch lernen, wie man spätere Anpassungen mit Flyway umsetzt.
 
-
-#### 10.b.I) Optionaler Abschweifer: Vorüberlegungen für initiale Daten (auf veraltete und unschöne Art)
+#### 10.b.I) Optionaler Abschweifer: Tabellen automatisch anlegen lassen, danach bei Programmstart (JPA-)Queries ausführen im CommandLineRunner
 
 Wir könnten mit POST-Requests (zB mit `curl` oder mit dafür gebasteltem Frontend) selbst Daten einpflegen, aber wir haben noch keine Speicherung der Daten über Endpunkte implementiert in dieser Anleitung.
 Außerdem haben wir auch noch kein Repository, das uns die Queries ausführt (OR-Mapper, machen wir aber weiter unten).
