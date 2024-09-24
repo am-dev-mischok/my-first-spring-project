@@ -1294,7 +1294,87 @@ curl localhost:8080/person/1
 
 ## 12) Entity mit allen CRUD-Operationen
 
-***TODO ALEX*** eine Beispielentity: Klasse, Repository, Service, Controller. Mit implementierten CRUD-Operationen mit JPA und den dazugehörigen Standardchecks, zunächst nur als JSON-Endpunkte, evtl auch mit Erwähnung von der Annotation `@RestController` und `@RequestMapping`.
+**CRUD** steht für **Create, Read, Update, Delete**. Das sind die grundlegenden Operationen zum Verwalten von Datensätzen.
+
+Im vorherigen Kapitel haben wir bereits für unsere Person Entity einige Endpunkte erstellt. Wir haben zwei **Read**-Endpunkte (`getPersons`, `getPersonById`) und einen **Create**-Endpunkt (`createPersonFromForm`).
+Wir erstellen in diesem Kapitel einen **Update**- und einen **Delete**-Endpunkt, sowie einen weiteren **Create**-Endpunkt (ohne Input durch ein Formular).
+
+### 12.a) Update-Endpunkt (PUT)
+
+Im letzten Kapitel konnte man schon im Code sehen, dass man beim Erstellen (**Create**) einer Entity voraussetzen sollte, dass die `id` von der Datenbank vergeben wird.
+Üblicherweise verbietet man dann bereits beim Input, dass die mitgeschickten Entity-Daten eine `id` enthalten.
+
+Beim Aktualisieren, bzw Überschreiben (**Update**) einer existierenden Entity, wird bei JPA ein Abgleich der `id` gemacht.
+D.h. man gibt die aktualisierte Entity an JPA ab und es wird die Entity in der Datenbank überschrieben, die die gleiche `id` hat.
+Deswegen wird bei einem **Update**-Endpunkt (üblicherweise HTTP-Verb **PUT**) geprüft, dass die mitgeschickten Entity-Daten eine `id` enthalten und es in der Datenbank eine Entity mit dieser `id` auch wirklich gibt.
+
+Unser Endpunkt könnte dafür so aussehen:
+```java
+@PutMapping(value = "/person")
+@ResponseBody
+public Person updatePerson(@RequestBody Person person) {
+    if (person.getId() == null) {
+        throw new RuntimeException("person to save has no id");
+    }
+
+    Optional<Person> existingPerson = personRepository.findById(person.getId());
+
+    if (existingPerson.isEmpty()) {
+        throw new RuntimeException("person to save has id, but person with this id cannot be found in database");
+    }
+
+    Person updatedPerson = personRepository.save(person);
+    return updatedPerson;
+}
+```
+
+Mit `curl` können wir den Endpunkt auch wieder testen.
+Nicht vergessen, vorher das Programm (neu) zu starten!
+```
+curl -X PUT \
+  -H 'Content-Type: application/json' \
+  -d '{ "id": 1, "name":"Thomas", "email":"anders@my.space", "age":"54", "married": true}' \
+  localhost:8080/person
+```
+  - in diesem `curl`-Request ändern wir grundlegend, welche Person hinter der Id 1 steckt.
+    Normalerweise wäre ein PUT-Request eher dafür da, um eine Entity zu aktualisieren, nicht um sie zu ersetzen.
+    Wir ändern hier nur für das Beispiel alle Werte, damit wir sehen, dass es wirklich funktioniert.
+    Am Ende können wir nur hoffen, dass die Endnutzer unserer Software so eine Id-Wiederverwertung vermeiden, bzw wir ihnen die richtigen Angewohnheiten durch unser Frontend nahelegen.
+
+
+### 12.b) Delete-Endpunkt (DELETE)
+
+Für unseren Endpunkt zum Löschen, sollte es reichen, wenn wir beim Aufruf des Endpunktes die `id` der zu löschenden Entity kriegen.
+Das kann man aber auch anders designen, um versehentliche Löschungen zu vermeiden.
+
+Unser Endpunkt könnte dann so aussehen:
+```java
+@DeleteMapping(value = "/personel")
+@ResponseBody
+public void deletePerson(@RequestParam(name="pId") Long personId) {
+    personRepository.deleteById(personId);
+}
+```
+  - wir machen es uns hier einfach und überprüfen wir gar nicht, ob es überhaupt eine Entity mit der angegebenen `id` gibt.
+    JPA wird, falls es diese Entity nicht gibt, einfach gar nichts löschen.
+    Man könnte auch entsprechend eine Fehlermeldung zurückgeben, falls es keine Entity mit dieser `id` gibt.
+  - auch hier setzen wir die Annotation `@RequestBody`, damit Spring nicht versucht, uns ein Thymeleaf-Template (oder statisches HTML) als Antwort zu servieren.
+
+Mit `curl` können wir den Endpunkt auch wieder testen.
+```
+curl -X DELETE \
+  localhost:8080/person?pId=2
+```
+
+Ob das geklappt hat, überprüfen wir dann mit einem schnellen Besuch unseres GET-Endpunkts `localhost:8080/person` im Browser, oder mit `curl`.
+
+
+### 12.c) Controller aufräumen, mit Service-Klasse und Annotationen
+
+***TODO ALEX***
+- hier Controller mit allen implementierten CRUD-Operationen (ohne Service-Klasse), inkl. neuem POST-Endpunkt für Input mit JSON
+- Annotations `@RestController` und `@RequestMapping` einsetzen
+- Service-Klasse einführen
 
 TODO eingehen auf paar einfache JpaQueries, zB findEmailBy...();
 
@@ -1309,7 +1389,9 @@ Hier gibt es viele Infos zu gültigen JPA-Queries: [Spring Docs -- JPA Query Met
 
 ## 14) Entities anzeigen, anlegen oder bearbeiten mit nur einem Thymeleaf-Template
 
-***TODO ALEX***
+Hier ist der Link zur Dokumentation von Thymeleaf bezüglich Forms: https://www.thymeleaf.org/doc/tutorials/2.1/thymeleafspring.html#creating-a-form
+
+***TODO ALEX*** Beispiel erstellen und hier beschreiben
 
 
 
@@ -1434,6 +1516,8 @@ Dafür setzen wir als Annotation an den Kopf einer Klasse oder Methode zB so ein
 
 
 ### 15.c) Spring Security in Thymeleaf
+
+TODO ALEX: erwähnen Inputparameter Controller-Endpunkt mit `UserPrincipal` oder so?
 
 Da das Template noch im Backend zu HTML umgewandelt wird (also Server-Side-Rendering), ist es nicht verwerflich, direkt im Thymeleaf-Template basierend auf dem Login des Users noch Sachen anzuzeigen oder nicht anzuzeigen.
 In einem JavaScript Frontend, oder sonstigem beim User zusammengebauten Frontend, sollte man das natürlich niemals tun.
