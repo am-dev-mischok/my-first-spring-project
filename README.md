@@ -1710,15 +1710,44 @@ Was ich beim Schreiben der Anleitung aus meinem Berufsleben eher kenne und deswe
 
 Im aktuellen Zustand haben wir jetzt fast so viele Ordner, wie wir Klassen haben.
 Wenn im Laufe des Projekts mehr Entities und Services und sonstiges dazu kommen, ergibt diese Einteilung deutlich mehr Sinn.
-Zu den Schichten können später noch Ordner wie `config`, `dto`, `enum`, `exception` oder andere dazukommen.
+Zu den Schichten können später noch Ordner wie `config`, `dto`, `enums`, `exception` oder andere dazukommen.
 
 
 
 ## 14) Entities anzeigen, anlegen oder bearbeiten mit nur einem Thymeleaf-Template
 
+Wir erstellen für diese Anleitung eine neue Entity `Recommendation` und dazu auch ein Repository, einen Service mit grundlegenden CRUD-Operationen und einen dazu passenden Controller mit Endpunkten ähnlich wie für unsere `Person`-Entity.
+Nur geben wir dieses Mal im Controller Thymeleaf-Templates zurück und auch die Art, wie wir Daten im Request mitschicken, wird leicht anders sein.
+
+Eine DB-Migration brauchen wir auch noch, in der wir eine Tabelle für die neue Entity erstellen.
+Unsere neue Entity werden wir, als kleinen Teaser für Springs Funktionen für Relations zwischen Entities, mit einer Many-to-One-Beziehung zu den `Person`-Entities verknüpfen.
+Eine eigene `enum` werden wir auch brauchen für ein Feld.
+
+Danach erstellen wir zwei Thymeleaf-Templates.
+
+
+### 14.a) Entity, Repository, Service, Endpunkte (im Controller)
+
+Kopiere dir die folgenden Dateien in dein Projekt rein und versuche mithilfe deiner IDE oder eigener Internetrecherche, für dich unbekannte Annotationen und sonstige Konzepte einigermaßen zu verstehen.
+
+***TODO ALEX*** Code reinkopieren
+
+
+### 14.b) Thymeleaf-Templates
+
+Wir erstellen zwei Thymeleaf-Templates.
+
+Im ersten zeigen wir alle verfügbaren Entities an und nutzen dafür Thymeleafs `th:each`, um mehrere Einträge in einer Schleife mit einem nur 1x definierten Stück HTML zu rendern zu rendern.
+Dabei werden abhängig vom übergebenen Request-Parameter manche der Entities besonders hervorgehoben, dank Thymeleafs `th:if`.
+
+Im zweiten Template können wir eine neue Entitiy erstellen, eine existierende Entity im Detail anzeigen, oder eine existierende Entity bearbeiten.
+Dort zeigen wir außerdem einen Button an, wenn wir gerade eine Entity bearbeiten, mit dem wir sie löschen können.
+Damit haben wir alle CRUD-Operationen in einem Thymeleaf-Template.
+
+***TODO ALEX*** erstellen
+
 Hier ist der Link zur Dokumentation von Thymeleaf bezüglich Forms: https://www.thymeleaf.org/doc/tutorials/2.1/thymeleafspring.html#creating-a-form
 
-***TODO ALEX*** Beispiel erstellen und hier beschreiben
 
 
 

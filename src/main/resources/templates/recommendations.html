@@ -1,0 +1,59 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Hello :-)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <link rel="stylesheet" th:href="@{/greeting-styles/boring.css}">
+<!--  TODO: use Bootstrap for styling-->
+</head>
+<body>
+  <header>
+    <h1>Alle Empfehlungen</h1>
+    <div>
+      <a href="/">
+        Zurück zur Hauptseite
+      </a>
+    </div>
+  </header>
+  <main>
+    <h2>
+      Empfehlungen:
+      <span th:text="${#lists.size(allRecommendations)}">0</span>
+      Stück
+    </h2>
+    <ul>
+      <li th:each="recommendation : ${allRecommendations}">
+        <a th:href="'/recommendation/' + ${recommendation.id}">
+          Details
+        </a>
+        <a th:href="'/recommendation/' + ${recommendation.id}">
+          Bearbeiten
+        </a>
+        <span>
+          <a th:href="${recommendation.url}"
+             th:text="${recommendation.name}">
+            name
+          </a>
+        </span>
+        <span th:text="${recommendation.rating}">
+          rating
+        </span>
+        <span th:text="${recommendation.description}">
+          description
+        </span>
+        <span th:text="${recommendation.submitted}">
+          submitted
+        </span>
+        <span th:text="${recommendation.targetGroup.label}">
+          targetGroup.label
+        </span>
+        <a th:if="${recommendation.discoverer != null}"
+           th:href="'/person/' + ${recommendation.discoverer.id}"
+           th:text="${recommendation.discoverer.name}">
+          discoverer.name
+        </a>
+      </li>
+    </ul>
+  </main>
+</body>
+</html>

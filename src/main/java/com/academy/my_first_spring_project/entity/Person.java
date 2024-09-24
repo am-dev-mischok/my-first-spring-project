@@ -3,6 +3,8 @@ package com.academy.my_first_spring_project.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Getter // die ersten 5 Annotations sind nur Lombok (Getter, Setter, Builder, ...ArgsConstructor)
 @Setter
 @Builder
@@ -28,4 +30,7 @@ public class Person {
 
     @Column(name = "married")
     private Boolean married;
+
+    @OneToMany(mappedBy = "discoverer")
+    public List<Recommendation> discoveredRecommendations;
 }
