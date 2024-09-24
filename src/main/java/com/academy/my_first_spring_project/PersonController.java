@@ -2,42 +2,46 @@ package com.academy.my_first_spring_project;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
+@RestController
+@RequestMapping("/person")
 public class PersonController {
 
     @Autowired
-    PersonRepository personRepository;
+    PersonService personService;
 
-    @GetMapping(value = "/person")
-    @ResponseBody
+    @GetMapping
     public List<Person> getPersons() {
-        return personRepository.findAll();
+        return personService.getAll();
     }
 
-    @GetMapping(value = "/person/{pId}")
-    @ResponseBody
+    @GetMapping(value = "/{pId}")
     public Person getPersonById(
             @PathVariable(name="pId") Long personId
     ) {
-        return personRepository.findById(personId)
-                .orElseThrow();
+        return personService.getById(personId);
     }
 
-    @PostMapping(value = "/person", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    @ResponseBody
+    @PostMapping
+    public Person createPerson(@RequestBody Person person) {
+        return personService.create(person);
+    }
+
+    @PostMapping(consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public Person createPersonFromForm(Person person) {
-        if (person.getId() != null) {
-            throw new RuntimeException("new person is not allowed to have an id already; let the database give an available id");
-        }
-        Person personWithId = personRepository.save(person);
-        return personWithId;
+        return personService.create(person);
+    }
+
+    @PutMapping
+    public Person updatePerson(@RequestBody Person person) {
+        return personService.update(person);
+    }
+
+    @DeleteMapping
+    public void deletePerson(@RequestParam(name="pId") Long personId) {
+        personService.delete(personId);
     }
 }

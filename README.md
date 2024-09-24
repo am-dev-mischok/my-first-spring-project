@@ -1500,19 +1500,196 @@ Das können wir auch an eine gemeinsame Stelle packen, indem wir den Controller 
 Wir müssen dann darauf achten, bei den einzelnen Endpunkten `"/person"` am Anfang wegzulassen, weil das jetzt automatisch an den Anfang ergänzt wird.
 
 Als letztes wollen wir möglichst wenig Business- und Entity-Logik in den Endpunkten des Controllers stehen haben.
-Bei Spring schreibt man sich dafür normalerweise eine **Service**-Klasse pro Entity, in der Business-Logik verarbeitet wird. Unser Controller ruft dann nicht mehr direkt das Repository auf und verarbeitet auch keine Ausnahmefälle im Umgang mit den Entities, sondern kümmert sich nur noch um die Durchreichung der Daten zwischen Aufruf und Service.
+Bei Spring schreibt man sich dafür normalerweise eine **Service**-Klasse pro Entity, in der Business-Logik verarbeitet wird.
+Unser Controller ruft dann nicht mehr direkt das Repository auf und verarbeitet auch keine Ausnahmefälle im Umgang mit den Entities, sondern kümmert sich nur noch um die Durchreichung der Daten zwischen Aufruf und Service.
+So können wir auch die Dopplung der Logik in den Endpunkten `createPerson` und `createPersonFromForm` loswerden.
 
-TODO ALEX CONTINUE
+Eine Service-Klasse wird in Spring annotiert mit `@Service`. Wie auch schon bei der Annotation `@Repository`, steckt technisch hinter `@Service` nicht viel mehr, als hinter `@Component`, und zwar dass Spring diese Klasse dann per Dependency Injection überall einsetzen kann. Wir annotieren aber lieber mit `@Service`, statt mit `@Component`, um uns selbst und allen zukünftigen Entwicklern klar zu zeigen, dass das eine Service-Klasse ist.
+
+So könnten dann unsere Klassen `PersonService` und `PersonController` aussehen.
+Im Controller wird nur noch der Service verwendet, nicht mehr das Repository:
+```java
+package com.academy.my_first_spring_project;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/person")
+public class PersonController {
+
+    @Autowired
+    PersonService personService;
+
+    @GetMapping
+    public List<Person> getPersons() {
+        return personService.getAll();
+    }
+
+    @GetMapping(value = "/{pId}")
+    public Person getPersonById(
+            @PathVariable(name="pId") Long personId
+    ) {
+        return personService.getById(personId);
+    }
+
+    @PostMapping
+    public Person createPerson(@RequestBody Person person) {
+        return personService.create(person);
+    }
+
+    @PostMapping(consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public Person createPersonFromForm(Person person) {
+        return personService.create(person);
+    }
+
+    @PutMapping
+    public Person updatePerson(@RequestBody Person person) {
+        return personService.update(person);
+    }
+
+    @DeleteMapping
+    public void deletePerson(@RequestParam(name="pId") Long personId) {
+        personService.delete(personId);
+    }
+}
+```
+
+Der Service:
+```java
+package com.academy.my_first_spring_project;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class PersonService {
+
+    @Autowired
+    private PersonRepository personRepository;
+
+    public List<Person> getAll() {
+        return personRepository.findAll();
+    }
+
+    public Person getById(Long id) {
+        Optional<Person> personOptional = personRepository.findById(id);
+
+        if (personOptional.isEmpty()) {
+            throw new RuntimeException("no person found with this id");
+        }
+
+        return personOptional.get();
+
+        // oder so:
+//        return personRepository.findById(id)
+//                .orElseThrow();
+    }
+
+    public Person create(Person person) throws RuntimeException {
+        // wir sollten checken, dass das neu zu erstellende Objekt keine id hat, denn diese wird automatisch vergeben von JPA
+        if (person.getId() == null) {
+            return personRepository.save(person);
+        } else {
+            throw new RuntimeException("new person is not allowed to have an id already; let the database assign an available id");
+        }
+    }
+
+    public Person update(Person person) throws RuntimeException {
+        if (person.getId() == null) {
+            throw new RuntimeException("person to save has no id");
+        }
+
+        Optional<Person> existingPerson = personRepository.findById(person.getId());
+
+        if (existingPerson.isEmpty()) {
+            throw new RuntimeException("person to save has id, but person with this id cannot be found in database");
+        }
+
+        Person updatedPerson = personRepository.save(person);
+        return updatedPerson;
+
+        // oder so:
+//        if (personRepository.existsById(person.getId())) { // throws IllegalArgumentException if id passed into existsById is null
+//            return personRepository.save(person);
+//        } else {
+//            throw new RuntimeException("person to save has id, but person with this id cannot be found in database");
+//        }
+    }
+
+    public void delete(Long id) {
+        personRepository.deleteById(id);
+    }
+}
+```
+
+#### Ausblick: weitere JPA Queries
+
+Wir verwenden bisher und auch sonst in dieser Anleitung nur die default Methoden vom JpaRepository.
+Wir können aber auch ganz einfach Queries schreiben, die für uns vorab filtert (wie WHERE in einer SQL-Query) oder zB Pagniation und Sortierung für uns regelt.
+Dafür müssen wir nur in der JPA-spqzifischen Sprache für **Custom Named Queries** einen Methodenkopf schreiben und können diese dann nutzen.
+
+Unser Repository könnte zum Beispiel so aussehen:
+```java
+package com.academy.my_first_spring_project;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.Collection;
+import java.util.List;
 
 
-***TODO ALEX***
-- hier Controller mit allen implementierten CRUD-Operationen (ohne Service-Klasse), inkl. neuem POST-Endpunkt für Input mit JSON
-- Annotations `@RestController` und `@RequestMapping` einsetzen
-- Service-Klasse einführen
+@Repository
+public interface PersonRepository extends JpaRepository<Person, Long> {
 
-TODO eingehen auf paar einfache JpaQueries, zB findEmailBy...();
+  // returns all Persons with name exactly equal to exactName
+  List<Person> findByName(String exactName);
 
-Hier gibt es viele Infos zu gültigen JPA-Queries: [Spring Docs -- JPA Query Methods](https://docs.spring.io/spring-data/jpa/reference/jpa/query-methods.html)
+  // returns all Persons with name equal to one of the names passed in the List of Strings manyNames
+  List<Person> findByNameIn(Collection<String> manyNames);
+
+  // returns all Persons with email not included in one of the emails passed in the List of Strings manyEmails
+  List<Person> findByEmailNotIn(Collection<String> manyEmails);
+
+  // returns all Persons with name exactly equal to exactName or email exactly equal to exactEmail
+  List<Person> findByNameOrEmail(String exactName, String exactEmail);
+
+  // returns all Persons with an email that ends with the String passed in the variable "suffix"
+  List<Person> findByEmailEndingWith(String suffix);
+
+  // returns all Persons that are exactly as old as "exactAge". Then examples for finding all persons that are older than minAgeExcluded, and then all that are at most maxAgeIncluded years old:
+  List<Person> findByAge(Integer exactAge);
+  List<Person> findByAgeGreaterThan(Integer minAgeExcluded);
+  List<Person> findByAgeLessThanEqual(Integer maxAgeIncluded);
+
+  // here we combine previous conditions
+  List<Person> findByAgeLessThanEqualAndEmailEndingWith(Integer maxAgeIncluded, String suffix);
+
+  // returns all Persons that are not married and who are older than minAgeExcluded years old. Afterwards almost the same Query, but with Sorting by email.
+  List<Person> findByMarriedFalseAndAgeGreaterThan(Integer minAgeExcluded);
+  List<Person> findByMarriedFalseAndAgeGreaterThanOrderByEmail(Integer minAgeExcluded);
+
+  // this returns true, if there is a Person whose married Boolean is the same as isMarried, and is exactAge years old. Else returns false:
+  Boolean existsByMarriedAndAge(Boolean isMarried, Integer exactAge);
+
+  // delete all persons with a specific condition and return the ids of the deleted entities. Here we delete all Persons with age less than or equal maxAgeIncluded years old, since we decided that they cannot use our website.
+  List<Long> deleteByAgeLessThanEqual(Integer maxAgeIncluded);
+
+  // this time we also delete everyone who has no age saved, just to be sure
+  List<Long> deleteByAgeIsNullOrAgeLessThanEqual(Integer maxAgeIncluded);
+}
+
+```
+  - die Methoden wurden nicht im Kontext dieser Anleitung getestet, sind aber angelehnt an Methoden aus anderen kleinen Projekten
+
+Hier gibt es viele Infos zu JPA-Queries: [Spring Docs -- Defining Query Methods](https://docs.spring.io/spring-data/jpa/reference/repositories/query-methods-details.html) und [Spring Docs -- JPA Query Methods](https://docs.spring.io/spring-data/jpa/reference/jpa/query-methods.html)
 
 
 ## 13) Dateien und Methoden sauber und strukturiert ablegen

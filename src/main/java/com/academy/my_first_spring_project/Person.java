@@ -8,7 +8,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity // damit weiß JPA, dass diese Java Klasse einer Datenbanktabelle entspricht
+@Entity // damit weiß JPA, dass diese Java-Klasse einer Datenbanktabelle entspricht
 @Table(name = "person") // so heißt die zur Klasse gehörende Datenbanktabelle
 public class Person {
 

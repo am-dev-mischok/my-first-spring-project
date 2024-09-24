@@ -1,5 +1,6 @@
 package com.academy.my_first_spring_project;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -7,6 +8,9 @@ import org.springframework.web.bind.annotation.*;
 
 @Controller
 public class GreetingController {
+
+    @Autowired
+    PersonService personService;
 
     @GetMapping(value = "/greeting", produces = MediaType.TEXT_HTML_VALUE)
     public String greeting(
@@ -23,10 +27,7 @@ public class GreetingController {
     @ResponseBody
     public Person personJson() {
         // Objekt erstellen, zB aus Datenbank holen, sonstige Business-Logik
-        Person person = Person.builder()
-                .id(7L)
-                .name("Paul")
-                .build();
+        Person person = personService.createExamplePerson();
         // zB stattdessen so eine Business-Logik, die mir eine Person mit Id 7 aus der Datenbank holt:
 //        Person person = personRepository.findById(7);
 
