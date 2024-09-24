@@ -61,7 +61,7 @@ Folgende Funktionalitäten werden wir haben:
   - **HTML** und **CSS** Grundlagen
   - ***Terminal*** in einem Ordner öffnen und keine Angst davor haben
   - optional: ***git*** installiert und Grundlagen dafür gelernt, um nach jedem Schritt (oder nach wenigen Schritten) einen schönen neuen Commit anzulegen
-    - am Ende dieser Anleitung, im [Anhang](#appendix), gibt es einen [Refresher](#appendix-git) zu git
+    - am Ende dieser Anleitung, im [Anhang](#section-appendix), gibt es einen [Refresher](#section-appendix-git) zu git
 - Betriebssystem: ***Ubuntu*** wäre gut
 - im Terminal installierte/verfügbare Programme:
   - **mvn**
@@ -120,12 +120,11 @@ Wir starten mit der Grundstruktur, die wir aus dem [Spring initializr](https://s
 - erstelle neben der main-Klasse auch eine Klasse `GreetingController.java` als Controller für unsere Endpunkte
 	- zuerst komplett ohne RequestParam, nur mit `Model model` für Thymeleaf
     ```java
-    package com.example.simple;
+    package com.academy.my_first_spring_project;
 
     import org.springframework.stereotype.Controller;
     import org.springframework.ui.Model;
     import org.springframework.web.bind.annotation.GetMapping;
-    import org.springframework.web.bind.annotation.RequestMapping;
 
     @Controller
     public class GreetingController {
@@ -213,7 +212,7 @@ Sondern wir geben einfach ein POJO (=*Plain Old Java Object*) zurück und Spring
 - jetzt brauchen wir ein POJO, das wir dann zurückgeben können.
   Für diese Anleitung Arbeiten wir beispielhaft mit einer Klasse `Person`:
   ```java
-  package com.example.simple;
+  package com.academy.my_first_spring_project;
 
   public class Person {
     private int id;
@@ -266,10 +265,10 @@ Tiefergehende Infos [bei Baeldung](https://www.baeldung.com/intro-to-project-lom
     </dependency>
     ```
   - jetzt würde das schon compilen, aber damit IntelliJ das für die Unterstützung beim Code Schreiben auch versteht, müssen wir das Plugin Lombok noch installieren.
-  Dann eventuell noch bei IntelliJ bei kleinem aufploppendem Dialog auf den Button mit "Enable Lombok Annotation Processing" klicken
+  Dann eventuell noch bei IntelliJ bei kleinem aufploppendem Dialog auf den Button mit "Enable Lombok Annotation Processing" klicken.
 - jetzt löschen wir bei unserem POJO die Getter und Setter und setzen stattdessen lombok-Annotations:
   ```java
-  package com.example.simple;
+  package com.academy.my_first_spring_project;
 
   import lombok.Getter;
   import lombok.Setter;
@@ -802,7 +801,7 @@ Unsere Daten wollen wir jetzt auch mal abspeichern, sodass sie nach einem Reques
 
 Es gibt viele Lösungen für Datenbanken, die man anbinden kann.
 Manche laufen als "In-Memory"-Datenbank und werden, wie der Arbeitsspeicher bei einem Laptop, komplett gelöscht beim Ausschalten des Programms.
-In solchen Datenbanken werden vor allem Dateien gecached, d.h. nicht auf Dauer zur Nutzung über mehrere Sitzungen persistiert.
+In solchen Datenbanken werden vor allem Dateien gecached, d.h. nicht auf Dauer zur Nutzung über mehrere Sitzungen persistiert, sondern nur zwischengespeichert für in nächster Zeit brauchbare Verarbeitung.
 
 Wir verwenden hier H2 ("Hypersonic 2") als Datenbank.
 H2 ist in Java geschrieben und bietet bei Spring eine einfache Einbindung mit tollen Features zum Herumprobieren.
@@ -829,7 +828,30 @@ Wenn wir jetzt unser Programm starten (wie immer zB im Terminal mit `./mvnw spri
   ```
   Error creating bean with name 'entityManagerFactory' [...]
   ```
-  - kurz gesagt: Spring findet keine Datenbank, also erstellen wir eine
+  - kurz gesagt: Spring findet keine Datenbank, also erstellen wir gleich eine
+
+Vorab erstellen wir bereits eine Repository-Klasse, mit ganz viel JPA-Magie.
+Nach dem Prinzip der **OR-Mapper** wollen wir nach dem **Repository-Pattern** ein Repository haben, das sich darum kümmert, dass wir nur angeben müssen **was** wir mit **welchem** Objekt tun wollen, und das Repository kümmert sich dann darum, dass die passenden Queries an die Datenbank geschickt und die Antwort der DB als passendes Java-Objekt zurückgegeben wird.
+Glücklicherweise gibt es bei JPA die Möglichkeit, einfach eine Klasse der folgenden Form zu erstellen: <span id="code-personrepository"></span>
+```java
+package com.academy.my_first_spring_project;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface PersonRepository extends JpaRepository<Person, Long> {
+}
+```
+- wir erstellen ein **interface**, das das **JpaRepository** erweitert
+  - dort müssen wir noch angeben, welche Klasse von Objekten (hier: `Person`) dieses Repository behandeln wird und welche Klasse der Primary Key (hier: Feld `id` vom Typ `Long`) hat.
+- voerst steht darin nichts weiteres, d.h. die geschweiften Klammern bleiben leer
+- **Achtung**: in vielen Anleitungen wird `CrudRepository` benutzt, statt `JpaRepository`.
+  Ersteres bietet aber viel weniger Funktionen.
+  Letzteres kann als direkte Verbesserung mit weiteren Funktionalitäten gesehen werden.
+
+Und schon haben wir ein für JPA brauchbares Repository.
+
 
 #### 10.a.II) H2-Datenbank einbinden
 
@@ -846,15 +868,15 @@ Sieht dann zum Beispiel so aus als neue Dependency in unserer `pom.xml`:
     Spring erwartet teilweise bestimmte Versionsnummern, weswegen es meistens empfehlenswert ist, die Versionszeile wegzulassen.
     Spring entscheidet dann, welche Version genommen werden soll.
     - Dieser Stichpunkt könnte gefährliches Halbwissen sein.
-      Für echte Projekte vielleicht selbst nochmal einlesen 👀
-      Zumindest wenn man hier bei H2 eine der neueren Versionen explizit angibt, funktioniert es nicht.
+      Für echte Projekte vielleicht selbst nochmal einlesen 👀 <!-- TODO ALEX? -->
+      Zumindest wenn man hier bei H2 eine der neueren Versionen explizit angibt, funktioniert nicht alles, wie es sollte.
   - außerdem gibt es oft noch eine Zeile mit einem `<scope>`-Tag, wie `<scope>test</scope>`
     Hier wird festgelegt, in welchem Scope diese Dependency zur Verfügung stehen soll.
-    Damit wollen wir uns aktuell nicht auseinandersetzen, also können wir die Zeile auch weglassen.
+    Damit wollen wir uns aktuell nicht auseinandersetzen, also können wir diese Zeile auch weglassen.
     Mehr Infos: [Baeldung -- Maven Dependency Scopes](https://www.baeldung.com/maven-dependency-scopes)
 
 Spring setzt bei H2 automatisch Default-Werte.
-Diese setzen wir aber trotzdem noch manuell, weil wir sie gleich direkt noch anpassen möchten.
+Diese setzen wir aber trotzdem noch manuell, weil wir sie gleich auch noch ändern möchten.
 Und auch damit wir ein Gefühl für solche Konfigurationen bekommen.
 Dafür kopieren wir folgende Zeilen in die Datei `application.properties`:
   ```
@@ -872,7 +894,7 @@ Mit diesen Default-Werten läuft die H2-Datenbank im **In-Memory**-Mode.
 Das heißt, dass die Datenbank bei jedem Programmstart neu erzeugt wird und beim Herunterfahren des Programms auch wieder gelöscht wird.
 Stattdessen können wir die Datei aber auch als Datei erstellt bekommen, im **File**-Mode.
 Dafür müssen wir nur die erste der oberen Konfigurationszeilen ändern.
-Der Teil `mem` muss zu `file` geändert werden und nach dem folgenden Doppelpunkt schreiben wir den Pfad hin, unter dem die Datenbank-Datei abgelegt werden soll.
+Der Teil `mem` muss zu `file` geändert werden und nach dem darauf folgenden Doppelpunkt schreiben wir den Pfad hin, unter dem die Datenbank-Datei abgelegt werden soll.
 Für diese Anleitung stellen wir es so ein:
   ```
   spring.datasource.url=jdbc:h2:file:./data/mynewdb
@@ -926,12 +948,13 @@ Um dieses Verhalten aber auch im File Mode zu haben, können wir folgende Zeile 
 spring.jpa.generate-ddl=true # <- mit dieser Property erstellt JPA die DB-Tabellen für uns
 ```
 
-Wenn wir jetzt noch fix unsere Repositories für JPA bereits implementiert hätten, könnten wir also auch anfängliche Datenbankeinträge anlegen, wenn wir sie brauchen (wie zB erste User).
+Mit unserem oben bereits angelegten `PersonRepository`, können wir jetzt auch anfängliche Datenbankeinträge anlegen, wenn wir sie brauchen (wie zB erste Personen, die es per default bereits geben soll).
 Oder wir könnten sie auch mit direkter Verbindung (zB JDBC) als Queries anlegen.
 
 Bei Spring gibt es eine Möglichkeit, bei Programmstart Code auszuführen.
 Dafür müssen wir nur eine `CommandLineRunner` Bean erstellen, zum Beispiel direkt unter unserer `main`.
-Im folgenden Beispiel ein paar Experimente, die dieser ANleitung vorausgingen:
+Unser `PersonRepository` können wir der Bean als Eingabeparameter mitgeben und dann auch benutzen.
+Im folgenden Beispiel ein paar Experimente, die dieser Anleitung vorausgingen:
 ```java
 @SpringBootApplication
 public class MyFirstSpringProjectApplication {
@@ -966,28 +989,46 @@ Dieses Vorgehen findet auch in einem viel zu knappen Tutorial von Spring Erwähn
 
 #### 10.b.II) Optionaler Abschweifer: Unkontrolliertes SQL-Skript ausführen lassen
 
+Eine andere Möglichkeit, beim Start eines Spring-Programms ein paar SQL-Queries ausführen zu lassen, ist die folgende.
+Wir erstellen eine Datei `data.sql` (Namensabweichungen evtl möglich, wurde bei Erstellung der Anleitung nicht ausprobiert) und legen sie ab in `src/main/resources`.
+In diese Datei können wir beliebige SQL-Queries schreiben, und auch wieder alle durch die verwendete Datenbank unterstützten SQL-Dialekte nutzen.
+
+Wenn unsere Datenbank im In-Memory Mode läuft, dann führt Spring diese Queries bei jedem Programmstart aus.
+Ist die DB aber im File Mode, dann wird die Datei nie aufgegriffen und ausgeführt.
+Das soll verhindern, dass initiale DB-Queries nicht bei jedem Start ausgeführt werden.
+
+Wenn wir wollen, dass die Queries in `src/main/resources/data.sql` auch im File Mode ausgeführt werden, müssen wir folgende Zeile in `application.properties` schreiben:
+
 ```
-#spring.sql.init.mode=always # <- wenn wir nicht Flyway benutzen wollen, sondern unsere Daten in resources/templates/data.sql erstellen wollen, aber unsere H2-DB als File haben, dann brauchen wir diese Property, damit Springdie Queries ausführt
+#spring.sql.init.mode=always # <- damit werden Queries aus main/resources/data.sql auch ausgeführt, wenn unsere H2-DB im File Mode ist
 ```
 
-TODO ALEX finish
+So könnten wir in `data.sql` folgendes reinschreiben, um eine Tabelle für unsere Entity `Person` zu erstellen:
+```sql
+CREATE TABLE IF NOT EXISTS person (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(255),
+    email VARCHAR(255),
+    age INT,
+    married BOOLEAN
+);
+```
+
+In der `data.sql` könnten wir dann auch noch initiale Daten mit ganz normalen INSERT-Queries erstellen.
 
 
-#### 10.c) Flyway zum Anlegen initialer Tabellen und Datensätze, sowie zum späteren Ändern des DB-Schemas oder sonstigen Queries
+### 10.c) Flyway zum Anlegen initialer Tabellen und Datensätze, sowie zum späteren Ändern des DB-Schemas oder sonstigen Queries
 
 Kommen wir zu einer schöneren Methode, die auch besonders empfehlenswert ist.
 Und zwar die Nutzung eines DB-Migration Tools wie ***Flyway*** oder ***Liquibase***.
+Wir werden Flyway verwenden.
 
 DB-Migrations sind im Grunde einfach versionierte Datenbankqueries, die für uns ausgeführt werden, wenn sie bei einer Datenbank noch nicht ausgeführt wurden.
 So können wir sicherstellen, dass Queries nicht mehrfach ausgeführt werden, auch wenn unser Programm zB täglich neu gestartet wird.
+
 Flyway übernimmt für uns dabei den Aufwand, das zu kontrollieren.
-Bei Flyway selbst schreiben wir aber wieder normale SQL-Queries (oder den verfügbaren Dialekt, zB PostgresQL bei einer Postgres-Datenbank).
-
-Wir werden Flyway verwenden.
-
-Hier ist ein Tutorial dazu bei Baeldung, aber nicht speziell für Spring und deswegen für uns nur teilweise brauchbar.
-Vieles davon können wir uns sparen: https://www.baeldung.com/database-migrations-with-flyway
-
+Dafür legt Flyway eine Tabelle in unserer Datenbank an, die automatisch geprüft wird auf noch zu erledigende Migrations und auch darauf, dass alle vorhandenen Migrations unverändert vorliegen.
+Bei Flyway selbst schreiben wir aber wieder normale SQL-Queries (oder den verfügbaren Dialekt, zB PostgresQL bei einer Postgres-Datenbank), also können nicht JPA verwenden.
 
 #### 10.c.I) Flyway einbinden (in einem Spring Projekt)
 
@@ -1000,17 +1041,19 @@ Das müssen wir tun:
   </dependency>
   ```
 
-... und das war es eigentlich schon, weil Spring alles andere für uns übernimmt.
+... und das war es schon, weil Spring alles andere für uns übernimmt.
 
 
 #### 10.c.II) Flyway nutzen
 
-Jetzt können wir immer, wenn wir eine einmalige Änderung an der Datenbank vornehmen wollen, eine SQL-Query (oder den von unserer Datenbank unterstützen SQL-Dialekt) schreiben und dank Flyway wird diese Query bei jeder Datenbank, die mit unserem Programm im Einsatz ist (zB lokal auf Geräten der Entwickler, beim online Testing-System, beim vom Kunden genutzten online Produktiv-System, ...) nur genau einmal ausgeführt.
-Damit die Flyway-Skripte kompatibel sind mit verschiedenen SQL-Dialekten, ist es eine gute Angewohnheit, möglichst wenige Features aus Dialekten zu nutzen und stattdessen bei normalem SQL zu bleiben, wenn möglich.
+Jetzt können wir immer, wenn wir eine einmalige Änderung an der Datenbank vornehmen wollen, eine SQL-Query (mit dem von unserer Datenbank unterstützen SQL-Dialekt) schreiben und dank Flyway wird diese Query bei jeder Datenbank, die mit unserem Programm im Einsatz ist (zB lokal auf Geräten der Entwickler, beim online Testing-System, beim vom Kunden genutzten online Produktiv-System, ...) nur genau einmal ausgeführt.
+Damit die Flyway-Skripte kompatibel sind mit verschiedenen SQL-Dialekten auf den verschiedenen Datenbanken im Einsatz, ist es eine gute Angewohnheit, möglichst wenige Features aus Dialekten zu nutzen und stattdessen bei größtenteils normalem SQL zu bleiben.
 
 Wenn wir neue Queries haben, die durch Flyway 1x ausgeführt werden sollen, müssen wir nur eine Datei erstellen im vom Spring dafür standardmäßig vorgesehenen Ordner: `src/main/resources/db/migration/`
-Diese Datei sollte, nach Name alphabetisch sortiert, nach allen anderen bereits vorhandenen Dateien kommen, damit FLyway die Dateien in der richtigen Reihenfolge ausführt.
-Standardmäßig werden Migrations-Dateien bei Flyway nach diesem Schema benannt (und ich habe beim Schreiben dieser Anleitung nicht ausprobiert, ob das nur eine optionale oder eine verpflichtende Konvention ist. Bonusaufgabe für den interessierten Leser, der sich nicht an Konventionen halten will und sich damit unbeliebt macht bei anderen Entwicklern):
+Diese Datei sollte, nach Name alphabetisch sortiert, nach allen anderen bereits vorhandenen Dateien kommen, damit Flyway die Dateien in der richtigen Reihenfolge ausführt.
+Standardmäßig werden Migrations-Dateien bei Flyway nach diesem Schema benannt
+(und ich habe beim Schreiben dieser Anleitung nicht ausprobiert, ob das nur eine optionale oder eine verpflichtende Konvention ist.
+Bonusaufgabe für den interessierten Leser, der sich nicht an Konventionen halten will und sich damit unbeliebt macht bei anderen Entwicklern):
 ```
 <Prefix><Version>__<Description>.sql
 ```
@@ -1019,11 +1062,13 @@ So könnten zum Beispiel mehrere Dateinamen in einem fortgeschrittenen Projekt a
 ```
 V1.000__CREATE_TABLE_PERSON.sql
 ...
-V1.005__DROP_UNIQUE_NAME_FROM_USER.sql
+V1.005__DROP_UNIQUE_FIRSTNAME_FROM_USER.sql
 ...
 V1.017__ALTER_TABLE_TEACHER.sql
 ...
 V2.013__CREATE_TABLE_TASK_AND_INSERT_STARTING_ENTRIES.sql
+...
+V2.035__CHANGE_TABLE_PROJECT_COLUMN_OWNER_DEFAULT_NULL.sql
 ...
 ```
 
@@ -1031,8 +1076,9 @@ V2.013__CREATE_TABLE_TASK_AND_INSERT_STARTING_ENTRIES.sql
 Selbst SQL-Kommentare oder Dateinamenänderungen werden sonst zu einem Fehler führen, da Flyway (oder auch Liquibase) mithilfe von Hashes sicherstellt, dass die Migrations konsistent bleiben.
 Kurz: wenn das Programm mal irgendwo lief, dann sollte die Migration-Datei nicht mehr angefasst werden.
 Wenn man eine fehlerhafte Migation-Datei lokal ausgeführt hat, sollte man hoffen, ein Backup der lokalen Daten zu haben.
+Oder man gleicht eine fehlerhafte Migration-Datei durch eine korrigierende Migration-Datei aus (wenn möglich).
 
-In einer einzigen Migration-Datei können beliebig viele SQL-Queries ausgeführt werden.
+In einer einzelnen Migration-Datei können beliebig viele SQL-Queries ausgeführt werden.
 Meistens werden Tabellen erstellt oder bearbeitet (zB Spalten oder Constraints ändern, hinzufügen, löschen etc), oder benötigte (Beispiel)Datensätze angelegt. Oder es werden automatisiert Einträge geändert, wenn sich die Business-Logik zum Beispiel entscheidet, dass ein Wert nicht mehr optional ist und dann alle NULL-Werte auf einen Default-Wert geändert werden.
 
 Jede Migration-Datei sollte eine abgeschlossene Aufgabe beinhalten, und entsprechend aus den dafür benötigten Queries bestehen, anstatt jede einzelne Query in eine eigene Datei zu stecken.
@@ -1052,12 +1098,13 @@ CREATE TABLE person (
 **Achtung!**: zumindest beim Rumprobieren für diese Anleitung, aber generell auch oft bei Datenbanken, gibt es häufig Probleme, wenn man eine Tabelle mit Namen `user` erstellen will.
 Häufig wird eine Tabelle mit diesem Namen eingerichtet, um Zugriffsberechtigungen zur Datenbank zu verwalten.
 Um User vom eigenen Programm zu speichern, kann man eine Tabelle zB mit Namen `application_user`, `app_user`, `system_user`, `my_user`, `custom_user` oder mit sonstigen Zusätzen im Namen anlegen.
-Auch die Entity-Klasse kann bei so einer Benennung besser auseinandergehalten werden von `org.h2.engine.User` `org.apache.catalina.User` oder `org.springframework.security.core.userdetails.User` (alles mögliche Imports beim Projekt dieser Anleitung).
+Auch eine entsprechend benannte Entity-Klasse kann bei so einer Benennung besser auseinandergehalten werden von `org.h2.engine.User` `org.apache.catalina.User` oder `org.springframework.security.core.userdetails.User` (alles mögliche Imports beim Code dieser Anleitung).
 
-Für die Spalte `id` verwenden wir hier eigentlich den PostgresQL-Dialekt, von dem wir zwei tolle Features nutzen.
-Und da H2 mit dem PostgresQL-Dialekt klar kommt, können wir die Features auch gut nutzen:
+Bei der Query verwenden wir hier für die Spalte `id` eigentlich den PostgresQL-Dialekt, von dem wir zwei tolle Features nutzen.
+Und da H2 mit dem PostgresQL-Dialekt klar kommt, können wir die Features überhaupt erst verwenden:
 - `PRIMARY KEY` können wir direkt bei der Spaltenbezeichnung dazuschreiben, statt wie in normalem SQL am Ende einen `CONSTRAINT` extra zu deklarieren, bei dem wir den Spaltennamen angeben müssen
-- `BIGSERIAL` ist eigentlich der Datentyp `BIGINT` (Integer mit mehr Speicherplatz; ähnlich wie in Java ein `Long` das gleiche ist wie ein `Integer` mit mehr Speicherplatz), kombiniert mit der Funktionalität, dass Ids automatisch aufeinanderfolgend vergeben werden können
+- `BIGSERIAL` ist eigentlich der Datentyp `BIGINT` (Integer mit mehr Speicherplatz; ähnlich wie in Java ein `Long` das gleiche ist wie ein `Integer` mit mehr Speicherplatz), kombiniert mit der Funktionalität, dass Ids automatisch aufeinanderfolgend vergeben werden können, also sequenziert werden.
+  Die Sequenzierung wird JPA dann auch verwenden, ohne sich selbst darum kümmern zu müssen.
 
 In nativem H2-Dialekt sähe eine ähnliche Query so aus:
 ```sql
@@ -1071,47 +1118,192 @@ CREATE TABLE person (
 );
 ```
 
-Und bei gewöhnlichem SQL müsste man komplett von Hand die Sequenz erstellen.
+Und bei gewöhnlichem SQL müsste man komplett von Hand die Sequenzierung der `id` erstellen.
 
 Jetzt haben wir mit Flyway eine Tabelle für die Entity `Person` erstellt und können diese befüllen.
 Für unsere Anleitung legen wir nicht mit Flyway weitere Personen an, sondern basteln uns gleich Endpunkte, die mit JPA Personen speichern und zurückgeben können.
 
-TODO ALEX
+
+### 10.d) JPA Repository erstellen und einsetzen
+
+Wie bereits [am Anfang des Kapitels](#code-personrepository) gezeigt, ist ein für JPA nutzbares Repository (nach dem Prinzip der **OR-Mapper**, genauer **Repository-Pattern**) erstellt:
+```java
+package com.academy.my_first_spring_project;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface PersonRepository extends JpaRepository<Person, Long> {
+}
+```
+
+Wenn wir dieses Repository irgendwo einsetzen wollen, können wir es bequem mit Springs **Dependency Injection** irgendwo instanziieren und dann nutzen.
+```java
+@Autowired
+private PersonRepository personRepository;
+```
+
+Ein Beispiel für die Nutzung eines Repositories, das von `JpaRepository` erbt, sehen wir in einem späteren [Kapitel, in dem wir im Controller unserer Entity allen CRUD-Operationen vervollständigen](#section-crud-entity).
 
 
 
-### TODO
-- JPA Query Methods Link: https://docs.spring.io/spring-data/jpa/reference/jpa/query-methods.html
+## 11) GET-Requests mit `@PathVariable`
 
+Wir kennen jetzt schon einige Annotations, die etwas mit mitgeschickten Daten zu tun haben:
+- `@RequestBody` brauchen wir bei einem **Inputparameter** eines Endpunkts, wenn er im Body, meist als JSON-Objekt, mitgeschickt wird.
+  - Spring wandelt uns hier automatisch ein JSON-Objekt um in die angegebene Java-Klasse.
+    Dafür sollten die Keys im JSON-Objekt zu Feldnamen der Java-Klasse passen.
+- `@RequestParam` brauchen wir bei einem **Inputparameter** eines Endpunkts, wenn er als Request-Parameter am Ende der Url, angehängt am Pfad mitgegeben wird.
+  - Der Pfad und der erste Request-Parameter werden mit einem "`?`" getrennt.
+  Alle weiteren Request-Parameter werden vom vorherigne getrennt mit einem "`&`".
+  - Spring kann hier automatisch die Strings in einfache andere Datentypen umwandeln, wie zB Zahlen.
+- `@ResponseBody` brauchen wir bei einem Endpunkt, der mit einem JSON-Objekt im Body **antwortet**
+  - Ein Controller, bei dem alle Endpunkte mit einem JSON-Objekt antworten, können wir auch mit `@RestController` (statt mit `@Controller`) annotieren, anstatt allen Endpunkten die `@ResponseBody`-Annotation zu geben.
 
-## 11) GET-Requests mit `@Pathvariable`
+### 11.a) `@PathVariable` einsetzen
 
-TODO Wiederholung: @RequestBody, @RequestParam, @ResponseBody
+Wir lernen noch die Annotation `@PathVariable` kennen, mit der man Inputparameter im Pfad mitgeben kann, statt als Request-Parameter oder als Teil des Bodys.
+Das wird meistens verwendet, um per GET-Request eine bestimmte Entity zu bekommen, meist direkt mit Angabe der `id` der Entity.
 
-TODO neu: @PathVariable, für GET einzelne Entity
+Damit das funktioniert, setzen wir im Pfad unserer `@GetMapping`-Annotation in geschweiften Klammern einen Variablennamen.
+Diesen referenzieren wir dann in der `@PathVariable`-Annotation an einem Inputparameter des Endpunkts, damit Spring den dort im Pfad geschriebenen Wert zum annotierten Inputparameter umwandelt (in unserem beispiel `Long`) und wir das erzeugte Java-Objekt (hier `Long personId`) nutzen können.
+
+Mit der `id` aus dem Pfad, können wir zum Beispiel die Person mit dieser Id über unser `personRepository` holen.
+Dieses instanziieren wir vorher per `@Autowired` (Dependency Injection) außerhalb des Endpunktes, am besten ganz oben im Controller.
 
 ```java
-@GetMapping(value = "/person")
-@ResponseBody
-public List<Person> getPersons() {
-    return personService.getAll();
-}
+@Autowired
+PersonRepository personRepository;
 
-@GetMapping(value = "/person/{personId}")
+@GetMapping(value = "/person/{pId}")
 @ResponseBody
 public Person getPersonById(
-  @PathVariable(name="personId") Long personId
+    @PathVariable(name="pId") Long personId
 ) {
-    return personService.getById(personId);
+  return personRepository.findById(personId)
+      .orElseThrow();
 }
+```
+  - In unserem Beispiel ist unsere Pfadvariable am Ende des Pfades, aber man kann sie auch mitten im Pfad haben.
+    Oder mehrere Pfadvariablen.
+    Das könnte dann zum Beispiel aussehen:
+      ```java
+      @GetMapping(value = "/pfad/{eineId}/weiter/{textId}/hey")
+      @ResponseBody
+      public Person getHierPassiertEtwas(
+          @PathVariable(name="eineId") Long someId,
+          @PathVariable(name="textId") String supplmentaryId
+      ) {
+        System.out.println("someId: " + someId);
+        System.out.println("supplmentaryId: " + supplmentaryId);
+        // hier passiert irgendetwas mit den Inputparametern
+      }
+      ```
+
+Mehr Infos zu Pfadvariablen wie immer bei Baeldung: https://www.baeldung.com/spring-pathvariable
+
+### 11.b) weitere Endpunkte mit JPA, um unsere Endpunkte testen zu können
+
+Unser `PersonController` sieht jetzt zum Beispiel so aus (wobei hier im reinkopierten Code der Inhalt von `createPersonFromForm` weggelassen wurde, um es kürzer zu halten):
+```java
+package com.academy.my_first_spring_project;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.List;
+
+@Controller
+public class PersonController {
+
+    @Autowired
+    PersonRepository personRepository;
+
+    @GetMapping(value = "/person")
+    @ResponseBody
+    public List<Person> getPersons() {
+        return personRepository.findAll();
+    }
+
+    @GetMapping(value = "/person/{pId}")
+    @ResponseBody
+    public Person getPersonById(
+            @PathVariable(name="pId") Long personId
+    ) {
+        return personRepository.findById(personId)
+                .orElseThrow();
+    }
+
+    @PostMapping(value = "/person", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public String createPersonFromForm(Person person) {
+        [...]
+    }
+}
+```
+  - die Zeile `.orElseThrow();` hängt direkt an hinter `personRepository.findById(...)` und wurde nur in eine neue Zeile geschoben, damit man es besser lesen kann.
+    Durch `.orElseThrow()` wird eine Exception geworden, falls mit der `personId` bei `findById(...)` keine Entity gefunden wird.
+    - das von `findById(...)` zurückgegebene Objekt ist ein `Optional<Person>`.
+      Mehr Infos zu Java Optionals bei Bedarf selbst recherchieren, oder [hier bei Baeldung](https://www.baeldung.com/java-optional).
+  - der GET-Endpunkt `getPersons` ist dank JPA und dem `personRepository` fix geschrieben.
+    **Tipp**: tippe in IntelliJ (oder in sonstiger IDE) `personRepository.` ein und schaue, welche Vorschläge für bereits verfügbare Methoden dir gemacht werden.
+
+
+Damit wir unsere beiden GET-Endpunkte auch gleich ausprobieren können, speichern wir in `createPersonFromForm` die mitgegebenen Personendaten auch ein.
+Das könnte so aussehen:
+```java
+@PostMapping(value = "/person", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+@ResponseBody
+public Person createPersonFromForm(Person person) {
+    if (person.getId() != null) {
+        throw new RuntimeException("new person is not allowed to have an id already; let the database give an available id");
+    }
+    Person personWithId = personRepository.save(person);
+    return personWithId;
+}
+```
+  - als Antwort geben wir den erstellten User zurück, damit wir uns gleich direkt vergewissern können, das er beim Speichern erfolgreich eine `id` zugewiesen bekommen hat.
+
+### 11.c) neue Endpunkte testen
+
+Unseren POST-Request können wir jetzt direkt aus unserer `index.html` testen -- also Programm laufen lassen, `localhost:8080` besuchen und dort das Formular ausfüllen.
+
+Oder auch per curl:
+```
+curl -X POST \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -d 'name=Paul+Heinz&email=paul_heinz96%40example.de&age=24&married=on' \
+  localhost:8080/person
+```
+
+Und unsere GET-Requests können wir durch Eingabe der URL im Web Browser testen:
+```
+localhost:8080/person
+localhost:8080/person/1
+```
+
+Oder wie immer auch mit `curl`:
+```
+curl localhost:8080/person
+curl localhost:8080/person/1
 ```
 
 
 
+<span id="section-crud-entity"></span>
+
 ## 12) Entity mit allen CRUD-Operationen
 
-***TODO ALEX*** eine Beispielentity: Klasse, Repository, Service, Controller. Mit implementierten CRUD-Operationen mit JPA und den dazugehörigen Standardchecks, zunächst nur als JSON-Endpunkte, evtl auch mit Erwähnung von der Annotation `@RestController`
+***TODO ALEX*** eine Beispielentity: Klasse, Repository, Service, Controller. Mit implementierten CRUD-Operationen mit JPA und den dazugehörigen Standardchecks, zunächst nur als JSON-Endpunkte, evtl auch mit Erwähnung von der Annotation `@RestController` und `@RequestMapping`.
 
+TODO eingehen auf paar einfache JpaQueries, zB findEmailBy...();
+
+Hier gibt es viele Infos zu gültigen JPA-Queries: [Spring Docs -- JPA Query Methods](https://docs.spring.io/spring-data/jpa/reference/jpa/query-methods.html)
 
 
 ## 13) Dateien und Methoden sauber und strukturiert ablegen
@@ -1275,11 +1467,11 @@ https://www.geeksforgeeks.org/spring-security-tutorial/
 
 
 
-<span id="appendix"></span>
+<span id="section-appendix"></span>
 
 # Anhang
 
-<span id="appendix-git"></span>
+<span id="section-appendix-git"></span>
 
 ## A) git, ein knapper Refresher
 
