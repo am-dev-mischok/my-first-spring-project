@@ -791,9 +791,6 @@ Durch die reingeladene Entity (also auch deren `id`), können wir direkt auch no
 
 Unsere Daten wollen wir jetzt auch mal abspeichern, sodass sie nach einem Request noch verfügbar sind.
 
-
-### 10.a) JPA und Datenbank anbinden
-
 Es gibt viele Lösungen für Datenbanken, die man anbinden kann.
 Manche laufen als "In-Memory"-Datenbank und werden, wie der Arbeitsspeicher bei einem Laptop, komplett gelöscht beim Ausschalten des Programms.
 In solchen Datenbanken werden vor allem Dateien gecached, d.h. nicht auf Dauer zur Nutzung über mehrere Sitzungen persistiert, sondern nur zwischengespeichert für in nächster Zeit brauchbare Verarbeitung.
@@ -803,6 +800,8 @@ H2 ist in Java geschrieben und bietet bei Spring eine einfache Einbindung mit to
 
 Mehr Infos zu Spring mit H2: https://www.baeldung.com/spring-boot-h2-database
 
+
+### 10.a) JPA vorbereiten
 
 #### 10.a.I) JPA Dependency im Projekt einbinden
 
@@ -825,9 +824,64 @@ Wenn wir jetzt unser Programm starten (wie immer zB im Terminal mit `./mvnw spri
   ```
   - kurz gesagt: Spring findet keine Datenbank, also erstellen wir gleich eine
 
-Vorab erstellen wir bereits eine Repository-Klasse, mit ganz viel JPA-Magie.
+Bevor wir eine Datenbank einbinden, erstellen wir bereits eine Repository-Klasse, mit ganz viel JPA-Magie.
 Nach dem Prinzip der **OR-Mapper** wollen wir nach dem **Repository-Pattern** ein Repository haben, das sich darum kümmert, dass wir nur angeben müssen **was** wir mit **welchem** Objekt tun wollen, und das Repository kümmert sich dann darum, dass die passenden Queries an die Datenbank geschickt und die Antwort der DB als passendes Java-Objekt zurückgegeben wird.
-Glücklicherweise gibt es bei JPA die Möglichkeit, einfach eine Klasse der folgenden Form zu erstellen: <span id="code-personrepository"></span>
+
+<span id="code-person-jpa-entity-repository"></span>
+
+#### 10.a.II) für JPA eine Entity erstellen
+
+Damit JPA ein Repository für eine Entity nutzen kann, brauchen wir zunächst eine Entity.
+Das Wort "Entity" wird oft in Abgrenzung zum gewöhnlichen Java-Objekt (POJO) verwendet, um zu meinen, dass es ein Java-Objekt mit einer persistenten Darstellung (bzw Speicherung) in einer Datenbank ist.
+Entsprechend sollte man vorsichtig damit umgehen, da alle angepassten Felder irgendwo vermutlich in der Datenbank landen.
+
+Eine Java-Klasse machen wir bei Spring mit der Annotation `@Entity` zu einer mit JPA nutzbaren Entity.
+Damit JPA auch weiß, in welcher Datenbanktabelle wir diese Entity speichern, fügen wir noch die Annotation `@Table(name = "person")` hinzu.
+Die Namen der Felder werden per default (eigentlich auch der Tabellenname), werden verwendet, um die richtigen DB-Tabellennamen zuzuordnen.
+Um sich nicht auf Default-Werte zu verlassen, können wir jedes Feld mit `@Column(name = "...")` annotieren und den Tabellenspaltennamen explizit angeben.
+Das Feld `private Long id;` braucht noch zwei weitere Annotations, damit JPA es ordentlich als Primary Key versteht und entsprechende Features funktionieren, wie automatische Id-Vergabe.
+
+Das alles könnte bei unserer `Person`-Klasse so aussehen:
+```java
+package com.academy.my_first_spring_project;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+@Getter // die ersten 5 Annotations sind nur Lombok (Getter, Setter, Builder, ...ArgsConstructor)
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity // damit weiß JPA, dass diese Java-Klasse einer Datenbanktabelle entspricht
+@Table(name = "person") // so heißt die zur Klasse gehörende Datenbanktabelle
+public class Person {
+
+    @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "age")
+    private Integer age;
+
+    @Column(name = "married")
+    private Boolean married;
+}
+
+```
+  - Wie vorher im Kapitel zu Lombok erwähnt, brauchen wir wegen der `@Builder`-Annotation und JPA auch noch den Konstruktor mit allen Argumenten und den leeren Konstruktor.
+    Deswegen sieht man hier und bei Entities häufig noch die Lombok-Annotation `@NoArgsConstructor` und `@AllArgsConstructor`.
+
+#### 10.a.III) für JPA ein Repository erstellen
+
+Für das Repository Glücklicherweise gibt es bei JPA die Möglichkeit, einfach eine Klasse der folgenden Form zu erstellen:
 ```java
 package com.academy.my_first_spring_project;
 
@@ -848,7 +902,7 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
 Und schon haben wir ein für JPA brauchbares Repository.
 
 
-#### 10.a.II) H2-Datenbank einbinden
+#### 10.b) H2-Datenbank einbinden
 
 Mit Maven binden wir ganz einfach H2 ein.
 Sieht dann zum Beispiel so aus als neue Dependency in unserer `pom.xml`:
@@ -884,7 +938,7 @@ Dafür kopieren wir folgende Zeilen in die Datei `application.properties`:
     Für die lokale Entwicklung ist das praktisch, sollte aber bei der Konfiguration für online liegende Datenbanken unbedingt geändert werden.
     Mehr Infos zu Konfigurationen in Spring abhängig vom Kontext, bzw zum Spring-Konzept der **Profiles**: https://www.baeldung.com/spring-profiles#profiles-in-spring-boot
 
-#### 10.a.III) H2: Modus wechseln von In-Memory zu File
+#### 10.b.I) H2: Modus wechseln von In-Memory zu File
 Mit diesen Default-Werten läuft die H2-Datenbank im **In-Memory**-Mode.
 Das heißt, dass die Datenbank bei jedem Programmstart neu erzeugt wird und beim Herunterfahren des Programms auch wieder gelöscht wird.
 Stattdessen können wir die Datei aber auch als Datei erstellt bekommen, im **File**-Mode.
@@ -899,7 +953,7 @@ Für diese Anleitung stellen wir es so ein:
 **Tipp**: in die `.gitignore` die Zeile `data/` einfügen, damit die DB-Datei nicht commited wird und die lokalen Testdaten damit auch lokal bleiben, statt damit den Speicherplatz auf Github (oder Gitlab) zu vermüllen.
 
 
-#### 10.a.IV) H2-Console
+#### 10.b.II) H2-Console
 
 Mit dem Modus umgestellt zu File, können wir die H2-Console nutzen, um unsere Datenbank zu sehen und Queries auszuführen.
 Die H2-Console ist (wenn man die Default-Werte nicht extra geändert hat) verfügbar unter `localhost:8080/h2-console`, während unser Programm läuft.
@@ -920,13 +974,13 @@ Zum Beispiel eine ***Postgres***-Datenbank, die neben höherer Performance bei v
 Bei H2 gibt es sogar die Möglichkeit, PostgresQL und andere SQL-Dialekte einzustellen, die dann von H2 imitiert werden.
 
 
-### 10.b) Optionaler Abschweifer: Initiale Tabellen und Datensätze anlegen (auf veraltete und unschöne Art)
+### 10.c) Optionaler Abschweifer: Initiale Tabellen und Datensätze anlegen (auf veraltete und unschöne Art)
 
 Dieses Unterkapitel kann zum Verständnis und für die Arbeit mit verranztem Legacy-Code ganz nützlich sein.
 Es kann aber auch komplett übersprungen werden, wenn man weniger interessiert ist an nicht so gut funktionierenden, umständlicheren Lösungen.
 Im nächsten Unterkapitel werden wir stattdessen ordentlich mit ***Flyway*** initiale Tabellen und Daten anlegen und auch lernen, wie man spätere Anpassungen mit Flyway umsetzt.
 
-#### 10.b.I) Optionaler Abschweifer: Tabellen automatisch anlegen lassen, danach bei Programmstart (JPA-)Queries ausführen im CommandLineRunner
+#### 10.c.I) Optionaler Abschweifer: Tabellen automatisch anlegen lassen, danach bei Programmstart (JPA-)Queries ausführen im CommandLineRunner
 
 Wir könnten mit POST-Requests (zB mit `curl` oder mit dafür gebasteltem Frontend) selbst Daten einpflegen, aber wir haben noch keine Speicherung der Daten über Endpunkte implementiert in dieser Anleitung.
 Außerdem haben wir auch noch kein Repository, das uns die Queries ausführt (OR-Mapper, machen wir aber weiter unten).
@@ -982,7 +1036,7 @@ public class MyFirstSpringProjectApplication {
 
 Dieses Vorgehen findet auch in einem viel zu knappen Tutorial von Spring Erwähnung: https://spring.io/guides/gs/accessing-data-jpa#_create_an_application_class
 
-#### 10.b.II) Optionaler Abschweifer: Unkontrolliertes SQL-Skript ausführen lassen
+#### 10.c.II) Optionaler Abschweifer: Unkontrolliertes SQL-Skript ausführen lassen
 
 Eine andere Möglichkeit, beim Start eines Spring-Programms ein paar SQL-Queries ausführen zu lassen, ist die folgende.
 Wir erstellen eine Datei `data.sql` (Namensabweichungen evtl möglich, wurde bei Erstellung der Anleitung nicht ausprobiert) und legen sie ab in `src/main/resources`.
@@ -1012,7 +1066,7 @@ CREATE TABLE IF NOT EXISTS person (
 In der `data.sql` könnten wir dann auch noch initiale Daten mit ganz normalen INSERT-Queries erstellen.
 
 
-### 10.c) Flyway zum Anlegen initialer Tabellen und Datensätze, sowie zum späteren Ändern des DB-Schemas oder sonstigen Queries
+### 10.d) Flyway zum Anlegen initialer Tabellen und Datensätze, sowie zum späteren Ändern des DB-Schemas oder sonstigen Queries
 
 Kommen wir zu einer schöneren Methode, die auch besonders empfehlenswert ist.
 Und zwar die Nutzung eines DB-Migration Tools wie ***Flyway*** oder ***Liquibase***.
@@ -1025,7 +1079,7 @@ Flyway übernimmt für uns dabei den Aufwand, das zu kontrollieren.
 Dafür legt Flyway eine Tabelle in unserer Datenbank an, die automatisch geprüft wird auf noch zu erledigende Migrations und auch darauf, dass alle vorhandenen Migrations unverändert vorliegen.
 Bei Flyway selbst schreiben wir aber wieder normale SQL-Queries (oder den verfügbaren Dialekt, zB PostgresQL bei einer Postgres-Datenbank), also können nicht JPA verwenden.
 
-#### 10.c.I) Flyway einbinden (in einem Spring Projekt)
+#### 10.d.I) Flyway einbinden (in einem Spring Projekt)
 
 Das müssen wir tun:
 - Dependency in unsere `pom.xml`:
@@ -1039,7 +1093,7 @@ Das müssen wir tun:
 ... und das war es schon, weil Spring alles andere für uns übernimmt.
 
 
-#### 10.c.II) Flyway nutzen
+#### 10.d.II) Flyway nutzen
 
 Jetzt können wir immer, wenn wir eine einmalige Änderung an der Datenbank vornehmen wollen, eine SQL-Query (mit dem von unserer Datenbank unterstützen SQL-Dialekt) schreiben und dank Flyway wird diese Query bei jeder Datenbank, die mit unserem Programm im Einsatz ist (zB lokal auf Geräten der Entwickler, beim online Testing-System, beim vom Kunden genutzten online Produktiv-System, ...) nur genau einmal ausgeführt.
 Damit die Flyway-Skripte kompatibel sind mit verschiedenen SQL-Dialekten auf den verschiedenen Datenbanken im Einsatz, ist es eine gute Angewohnheit, möglichst wenige Features aus Dialekten zu nutzen und stattdessen bei größtenteils normalem SQL zu bleiben.
@@ -1119,19 +1173,9 @@ Jetzt haben wir mit Flyway eine Tabelle für die Entity `Person` erstellt und k�
 Für unsere Anleitung legen wir nicht mit Flyway weitere Personen an, sondern basteln uns gleich Endpunkte, die mit JPA Personen speichern und zurückgeben können.
 
 
-### 10.d) JPA Repository erstellen und einsetzen
+### 10.e) JPA einsetzen
 
-Wie bereits [am Anfang des Kapitels](#code-personrepository) gezeigt, ist ein für JPA nutzbares Repository (nach dem Prinzip der **OR-Mapper**, genauer **Repository-Pattern**) erstellt:
-```java
-package com.academy.my_first_spring_project;
-
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
-@Repository
-public interface PersonRepository extends JpaRepository<Person, Long> {
-}
-```
+Bereits [am Anfang des Kapitels](#code-person-jpa-entity-repository) haben wir eine für JPA nutzbare Entity und ein Repository (nach dem Prinzip der **OR-Mapper**, genauer **Repository-Pattern**) erstellt.
 
 Wenn wir dieses Repository irgendwo einsetzen wollen, können wir es bequem mit Springs **Dependency Injection** irgendwo instanziieren und dann nutzen.
 ```java
@@ -1349,7 +1393,7 @@ Das kann man aber auch anders designen, um versehentliche Löschungen zu vermeid
 
 Unser Endpunkt könnte dann so aussehen:
 ```java
-@DeleteMapping(value = "/personel")
+@DeleteMapping(value = "/person")
 @ResponseBody
 public void deletePerson(@RequestParam(name="pId") Long personId) {
     personRepository.deleteById(personId);
@@ -1369,7 +1413,97 @@ curl -X DELETE \
 Ob das geklappt hat, überprüfen wir dann mit einem schnellen Besuch unseres GET-Endpunkts `localhost:8080/person` im Browser, oder mit `curl`.
 
 
-### 12.c) Controller aufräumen, mit Service-Klasse und Annotationen
+### 12.c) Controller aufräumen, mit Annotationen und Service-Klasse
+
+Nachdem wir auch noch einen neuen POST-Endpunkt (**Create**) mit JSON-Input erstellt haben, könnte unser ganzer Controller so aussehen:
+```java
+package com.academy.my_first_spring_project;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
+
+@Controller
+public class PersonController {
+
+    @Autowired
+    PersonRepository personRepository;
+
+    @GetMapping(value = "/person")
+    @ResponseBody
+    public List<Person> getPersons() {
+        return personRepository.findAll();
+    }
+
+    @GetMapping(value = "/person/{pId}")
+    @ResponseBody
+    public Person getPersonById(
+            @PathVariable(name="pId") Long personId
+    ) {
+        return personRepository.findById(personId)
+                .orElseThrow();
+    }
+
+    @PostMapping(value = "/person")
+    @ResponseBody
+    public Person createPerson(@RequestBody Person person) {
+        if (person.getId() != null) {
+            throw new RuntimeException("new person is not allowed to have an id already; let the database give an available id");
+        }
+        Person personWithId = personRepository.save(person);
+        return personWithId;
+    }
+
+    @PostMapping(value = "/person", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @ResponseBody
+    public Person createPersonFromForm(Person person) {
+        if (person.getId() != null) {
+            throw new RuntimeException("new person is not allowed to have an id already; let the database give an available id");
+        }
+        Person personWithId = personRepository.save(person);
+        return personWithId;
+    }
+
+    @PutMapping(value = "/person")
+    @ResponseBody
+    public Person updatePerson(@RequestBody Person person) {
+        if (person.getId() == null) {
+            throw new RuntimeException("person to save has no id");
+        }
+
+        Optional<Person> existingPerson = personRepository.findById(person.getId());
+
+        if (existingPerson.isEmpty()) {
+            throw new RuntimeException("person to save has id, but person with this id cannot be found in database");
+        }
+
+        Person updatedPerson = personRepository.save(person);
+        return updatedPerson;
+    }
+
+    @DeleteMapping(value = "/person")
+    @ResponseBody
+    public void deletePerson(@RequestParam(name="pId") Long personId) {
+        personRepository.deleteById(personId);
+    }
+}
+```
+
+Zunächst können wir uns die vielen Annotations `@ResponseBody` weglassen und stattdessen ganz oben das `@Controller` durch `@RestController` ersetzen, wenn sowieso alle Endpunkte mit JSON antworten.
+
+Als nächstes sehen wir, dass jeder Pfad mit `"/person"` beginnt.
+Das können wir auch an eine gemeinsame Stelle packen, indem wir den Controller selbst ganz oben annotieren mit `@RequestMapping("/person")`.
+Wir müssen dann darauf achten, bei den einzelnen Endpunkten `"/person"` am Anfang wegzulassen, weil das jetzt automatisch an den Anfang ergänzt wird.
+
+Als letztes wollen wir möglichst wenig Business- und Entity-Logik in den Endpunkten des Controllers stehen haben.
+Bei Spring schreibt man sich dafür normalerweise eine **Service**-Klasse pro Entity, in der Business-Logik verarbeitet wird. Unser Controller ruft dann nicht mehr direkt das Repository auf und verarbeitet auch keine Ausnahmefälle im Umgang mit den Entities, sondern kümmert sich nur noch um die Durchreichung der Daten zwischen Aufruf und Service.
+
+TODO ALEX CONTINUE
+
 
 ***TODO ALEX***
 - hier Controller mit allen implementierten CRUD-Operationen (ohne Service-Klasse), inkl. neuem POST-Endpunkt für Input mit JSON
