@@ -641,9 +641,7 @@ Dafür brauchen wir nur statt `@GetMapping` ein `@PostMapping` und außerdem noc
 ## 9) HTML-Form für GET- und POST-Requests
 Die Daten, die wir mit einem Request mitschicken, wollen wir aus einer Eingabe vom User nehmen.
 
-### 9.a) Ohne Thymeleaf, nur HTML
-
-#### 9.a.I) GET-Request mit HTML-Form
+### 9.a) GET-Request mit HTML-Form
 
 Da es bei einem GET-Request keinen Body gibt, werden die Eingaben als Key-Value-Pairs (oder hier treffender: Name-Value-Pairs) in die Request-Parameter hinter den Pfad gehängt.
 
@@ -680,7 +678,7 @@ Probiere es aus und schaue nach, wie nach Abschicken des Formulars der Request i
 Mit diesem Formular können wir ganz einfach den Namen eingeben in das Textfeld (erstellt durch `<input type="text">`) und das Styling auswählen im Dropdown (`<select>` mit passenden Auswahlmöglichkeiten `<option>`) und durch einen Klick auf den `<button>` wird der GET-Request richtig formatiert für uns abgeschickt und wir sehen unsere gewohnte Greeting-Seite.
 
 
-#### 9.a.II) POST-Request mit HTML-Form
+### 9.b) POST-Request mit HTML-Form
 
 Für einen POST-Request müssen wir beim `<form>`-Tag das Attribut `method` anders setzen.
 Und in unserem Fall auch den Pfad, da wir unter `/greeting` keinen POST-Request haben.
@@ -747,7 +745,7 @@ Das ist bei HTML-Formularen leider so und deswegen sollte man irgendwo ab Empfan
 Auch bei manchen anderen Feldern, wie dem Zahleninput vom Alter, wird null abgeschickt, wenn nichts drinnen steht.
 Leere Textfelder schicken aber einen leeren String ab.
 
-#### 9.a.III) Formular-Request imitieren mit `curl`
+### 9.c) Formular-Request imitieren mit `curl`
 
 Den POST-Request, der von der Form abgeschickt wird, können wir bei Bedarf auch mit `curl` abschicken.
 Dafür müssen wir in den Headers den passenden `Content-Type` ankündigen.
@@ -777,17 +775,14 @@ curl -X GET \
 ```
   - wie schon letztes Mal, als wir mit `curl` GET-Endpunkte aufgerufen haben, setzen wir wieder im Header, dass wir `text/html` erwarten, damit uns nicht der JSON-zurückgebende GET-Endpunkt antwortet
 
-
-
-### 9.b) Mit (möglichst wenig) Thymeleaf
-
-Hier ist der Link zur Dokumentation von Thymeleaf bezüglich Forms: https://www.thymeleaf.org/doc/tutorials/2.1/thymeleafspring.html#creating-a-form
-
-***TODO ALEX*** Beispiel einfügen
+### 9.d) Ausblick Thymeleaf
 
 In einem späteren Kapitel basteln wir ein Thymeleaf-Template, in dem die Eingabefelder durch Daten aus einer bestehenden Entity (teilweise) vorausgefüllt sind.
+Eigentlich brauchen wir dafür nicht viel mehr, als ein HTML-Formular, in dem wir mithilfe von Thymeleaf noch die von HTML bereitgestellten Attribute zum Befüllen der Startwerte setzen.
+
 Dieses eine Template können wir dann verwenden, um neue Entities zu erstellen, existierende zu bearbeiten, und existierende im Detail anzuzeigen.
 Also drei Funktionen in einem Template!
+Durch die reingeladene Entity (also auch deren `id`), können wir direkt auch noch einen "Löschen"-Button hinzufügen, und schon haben wir alle CRUD-Operationen in einem Thymeleaf-Template.
 
 
 
