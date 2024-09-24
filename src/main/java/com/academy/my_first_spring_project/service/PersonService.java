@@ -1,5 +1,7 @@
-package com.academy.my_first_spring_project;
+package com.academy.my_first_spring_project.service;
 
+import com.academy.my_first_spring_project.repository.PersonRepository;
+import com.academy.my_first_spring_project.entity.Person;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

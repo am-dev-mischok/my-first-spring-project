@@ -1694,7 +1694,23 @@ Hier gibt es viele Infos zu JPA-Queries: [Spring Docs -- Defining Query Methods]
 
 ## 13) Dateien und Methoden sauber und strukturiert ablegen
 
-***TODO ALEX*** Trennung Controller <-> Service <-> Repository <-> Entity und sonstige von Spring benötigte Klassen, damit nicht alles in einem Ordner liegt.
+Damit unsere Java-Klassen nicht so unstrukturiert rumliegen und im Laufe des Projekts immer unfindbarer werden, legen wir sie ordentlich in Ordner ab.
+
+![Screenshot der Java-Klassen nach Befolgung der Anleitung bis hierher](images/dirs-none.png "Screenshot der Java-Klassen nach Befolgung der Anleitung bis hierher")
+
+Zwei gängige Arten, Ordner zu erstellen, bieten sich hier offensichtlich an.
+
+Wir können pro Domain bzw pro Entity einen Ordner mit den dazugehörigen Klassen erstellen:
+
+![Screenshot der Java-Klassen, mit Ordnern je nach Layer (Entity, Repository, Service, Controller)](images/dirs-domains.png "Screenshot der Java-Klassen, mit Ordnern je nach Layer (Entity, Repository, Service, Controller)")
+
+Was ich beim Schreiben der Anleitung aus meinem Berufsleben eher kenne und deswegen vermutlich nur aus Gewohnheit bevorzuge, ist eine Ordnerstruktur, die die verschiedenen Schichten Entity, Repository, Service und Controller voneinander trennt:
+
+![Screenshot der Java-Klassen, mit Ordnern je nach Entity bzw Domain](images/dirs-layers.png "Screenshot der Java-Klassen, mit Ordnern je nach Entity bzw Domain")
+
+Im aktuellen Zustand haben wir jetzt fast so viele Ordner, wie wir Klassen haben.
+Wenn im Laufe des Projekts mehr Entities und Services und sonstiges dazu kommen, ergibt diese Einteilung deutlich mehr Sinn.
+Zu den Schichten können später noch Ordner wie `config`, `dto`, `enum`, `exception` oder andere dazukommen.
 
 
 

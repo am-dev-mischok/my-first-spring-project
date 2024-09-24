@@ -1,5 +1,6 @@
 package com.academy.my_first_spring_project;
 
+import com.academy.my_first_spring_project.repository.PersonRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

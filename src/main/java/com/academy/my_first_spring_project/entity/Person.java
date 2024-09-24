@@ -1,4 +1,4 @@
-package com.academy.my_first_spring_project;
+package com.academy.my_first_spring_project.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
