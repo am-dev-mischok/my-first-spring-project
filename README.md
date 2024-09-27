@@ -1944,7 +1944,7 @@ Die offizielle Seite hat auch eine [ausführliche Anleitung](https://git-scm.com
 
 ---
 
-#### git add**
+#### git add
 - bereitet Änderungen darauf vor, im nächsten Commit abgespeichert zu werden
 - **git add .** bereitet alle Änderungen des aktuellen Ordners (und seiner Nachfahren) für den nächsten Commit vor
 - **git add -p** entscheide stückweise, welche Änderungen für den nächsten Commit vorbereitet werden
