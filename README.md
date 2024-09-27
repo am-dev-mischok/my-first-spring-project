@@ -1900,6 +1900,8 @@ https://www.geeksforgeeks.org/spring-security-tutorial/
 
 ***TODO ALEX*** User speichern und auch beim Login aus Datenbank auslesen.
 
+Super Link von Baeldung: https://www.baeldung.com/spring-security-authentication-with-a-database
+
 
 
 <span id="section-appendix"></span>
