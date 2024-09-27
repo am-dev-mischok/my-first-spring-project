@@ -1,6 +1,6 @@
-# My first Spring Backend (+Thymeleaf Frontend, auch mit JSON als Antwort)
+# My first Spring Boot Backend (+Thymeleaf Frontend, auch mit JSON als Antwort)
 
-Das hier ist eine Schritt-für-Schritt-Anleitung für die Erstellung eines ersten [Spring](https://spring.io/) Backends.
+Das hier ist eine Schritt-für-Schritt-Anleitung für die Erstellung eines ersten Backends mit [Spring Boot](https://spring.io/projects/spring-boot).
 Entstanden im Rahmen vom Modul "Software-Architektur 1" in der Mischok Academy.
 
 <!-- this adds a Table of Contents in gitlab flavored markdown, but does not work on github. -->
@@ -9,6 +9,14 @@ Entstanden im Rahmen vom Modul "Software-Architektur 1" in der Mischok Academy.
 
 
 ## 0) Einleitung
+
+In dieser Anleitung nutzen wir "Spring Boot", nicht nur "Spring". Aber was ist eigentlich "***Spring Boot***"?
+Grob zusammengefasst steht das "Boot" dafür, dass wir schneller und unkomplizierter loslegen können mit unserem Projekt, indem uns viele Voreinstellungen und Designentscheidungen bereits abgenommen werden.
+Das alles könnten wir bei Bedarf später noch überschreiben.
+Eine etwas längere Erklärung gibt es im [bereits oben gesetzten Link](https://spring.io/projects/spring-boot) und [in der Dokumentation zu Spring Boot](https://docs.spring.io/spring-boot/index.html).
+
+In dieser Anleitung werden wir oft salopp von "Spring" reden, aber eigentlich "Spring Boot" meinen.
+
 
 ### 0.a) Für Dozierende und Wiederholungstäter
 Beim YouTuber *Amigoscode* gibt es ein ganz nettes, fixes, nur 97-minütiges Video [Spring Boot Tutorial | Full Course [2023] [NEW]](https://www.youtube.com/watch?v=9SGDpanrc8U), in dem er mit nur wenigen Unterschieden zur Vorgehensweise aus der folgenden Anleitung die Basics erklärt.
@@ -1901,6 +1909,13 @@ https://www.geeksforgeeks.org/spring-security-tutorial/
 ***TODO ALEX*** User speichern und auch beim Login aus Datenbank auslesen.
 
 Super Link von Baeldung: https://www.baeldung.com/spring-security-authentication-with-a-database
+
+
+
+## 17) Automatisiertes Testing
+
+Netter Einstiegslink zu Uni Tests bei Spring Boot, unter der Überschrift "Add Unit Tests": https://spring.io/guides/gs/spring-boot#_add_unit_tests
+
 
 
 
