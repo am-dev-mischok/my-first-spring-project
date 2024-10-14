@@ -11,6 +11,8 @@ import java.util.Optional;
 @Service
 public class PersonService {
 
+    private final int ADULT_MIN_AGE = 18;
+
     @Autowired
     private PersonRepository personRepository;
 
@@ -34,11 +36,14 @@ public class PersonService {
 
     public Person create(Person person) throws RuntimeException {
         // wir sollten checken, dass das neu zu erstellende Objekt keine id hat, denn diese wird automatisch vergeben von JPA
-        if (person.getId() == null) {
-            return personRepository.save(person);
-        } else {
+        if (person.getId() != null) {
             throw new RuntimeException("new person is not allowed to have an id already; let the database assign an available id");
         }
+        if (person.getAge() < ADULT_MIN_AGE) {
+            throw new RuntimeException("person's age too low, is not an adult");
+        }
+
+        return personRepository.save(person);
     }
 
     public Person update(Person person) throws RuntimeException {

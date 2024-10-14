@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat; // import static, damit wir direkt assertThat benutzen können, ohne immer Assertions.assertThat schreiben zu müssen
+import static org.assertj.core.api.Assertions.fail;
 
 @SpringBootTest
 public class PersonServiceTest {
@@ -42,8 +43,8 @@ public class PersonServiceTest {
         personService.create(personAllInfo);
 
         List<Person> existingPersons = personService.getAll();
-        Assertions.assertThat(existingPersons).hasSize(1); // ohne static import
-        assertThat(existingPersons).hasSize(1); // mit static import
+
+        assertThat(existingPersons).hasSize(1);
 
         Person existingPerson = existingPersons.get(0);
 
@@ -70,10 +71,40 @@ public class PersonServiceTest {
     public void createPerson_malformedEmail_badRequest() {
         // ...
     }
+
     @Test
-    public void createPerson_notAdult_forbidden() {
-        // ...
+    public void createPerson_notAdult_error() {
+        Person personAllInfo = Person.builder()
+                .name("Tommy")
+                .email("tommy@tim.de")
+                .age(17) // we assume that one is adult from the age of 18
+                .married(false)
+                .build();
+
+        try {
+            personService.create(personAllInfo);
+            fail("person is underage, but there was no exception");
+        } catch (RuntimeException e) {
+            assertThat(e.getMessage()).isEqualTo("person's age too low, is not an adult");
+        }
     }
+
+    @Test
+    public void createPerson_freshAdult_ok() {
+        Person personAllInfo = Person.builder()
+                .name("Tommy")
+                .email("tommy@tim.de")
+                .age(18) // we assume that one is adult from the age of 18
+                .married(false)
+                .build();
+
+        try {
+            personService.create(personAllInfo);
+        } catch (RuntimeException e) {
+            fail("person is adult, but there was an exception");
+        }
+    }
+
     @Test
     public void createPerson_offensiveName_forbidden() {
         // ...
