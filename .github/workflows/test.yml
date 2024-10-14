@@ -35,5 +35,9 @@ jobs:
             ${{ runner.os }}-maven-
 
       # Run Maven build and tests
-      - name: Build and test with Maven
-        run: mvn clean install -e -X
+      - name: Build
+        run: mvn clean install
+
+      # Run tests
+      - name: Run tests
+        run: mvn test
