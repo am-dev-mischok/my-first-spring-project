@@ -57,19 +57,77 @@ public class PersonServiceTest {
 
     @Test
     public void createPerson_someInfoNull_ok() {
-        // ...
+        Person personAllInfo = Person.builder()
+                .name(null)
+                .email(null)
+                .age(20)
+                .married(null)
+                .build();
+
+        personService.create(personAllInfo);
+
+        List<Person> existingPersons = personService.getAll();
+
+        assertThat(existingPersons).hasSize(1);
+
+        Person existingPerson = existingPersons.get(0);
+
+        assertThat(existingPerson.getId()).isNotNull();
+        assertThat(existingPerson.getName()).isNull();
+        assertThat(existingPerson.getEmail()).isNull();
+        assertThat(existingPerson.getAge()).isEqualTo(20);
+        assertThat(existingPerson.getMarried()).isNull();
     }
+
     @Test
     public void createPerson_noName_badRequest() {
-        // ...
+        Person personAllInfo = Person.builder()
+                .name("")
+                .email("e@mail.com")
+                .age(20)
+                .married(false)
+                .build();
+
+        try {
+            personService.create(personAllInfo);
+            fail("person has a blank name, but there was no exception");
+        } catch (RuntimeException e) {
+            assertThat(e.getMessage()).isEqualTo("person may not have a blank name");
+        }
     }
+
     @Test
     public void createPerson_noEmail_badRequest() {
-        // ...
+        Person personAllInfo = Person.builder()
+                .name("Michael")
+                .email(" ")
+                .age(20)
+                .married(true)
+                .build();
+
+        try {
+            personService.create(personAllInfo);
+            fail("person has a blank email, but there was no exception");
+        } catch (RuntimeException e) {
+            assertThat(e.getMessage()).isEqualTo("person may not have a blank email");
+        }
     }
+
     @Test
     public void createPerson_malformedEmail_badRequest() {
-        // ...
+//        Person personAllInfo = Person.builder()
+//                .name("Michael")
+//                .email("mail.de")
+//                .age(20)
+//                .married(true)
+//                .build();
+//
+//        try {
+//            personService.create(personAllInfo);
+//            fail("person has no valid email, but there was no exception");
+//        } catch (RuntimeException e) {
+//            assertThat(e.getMessage()).isEqualTo("person must have a valid email");
+//        }
     }
 
     @Test

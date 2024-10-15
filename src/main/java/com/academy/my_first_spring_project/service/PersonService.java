@@ -39,8 +39,19 @@ public class PersonService {
         if (person.getId() != null) {
             throw new RuntimeException("new person is not allowed to have an id already; let the database assign an available id");
         }
+
         if (person.getAge() < ADULT_MIN_AGE) {
             throw new RuntimeException("person's age too low, is not an adult");
+        }
+
+        // da der Name "null" sein darf, jedoch nicht leer oder nur Leerzeichen enthalten darf,
+        // prüfen wir zuerst auf "nicht null" und anschließend auf "isBlank"
+        if (person.getName() != null && person.getName().isBlank()) {
+            throw new RuntimeException("person may not have a blank name");
+        }
+
+        if (person.getEmail() != null && person.getEmail().isBlank()) {
+            throw new RuntimeException("person may not have a blank email");
         }
 
         return personRepository.save(person);
