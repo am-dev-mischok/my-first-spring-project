@@ -1,7 +1,7 @@
 package com.academy.my_first_spring_project.service;
 
-import com.academy.my_first_spring_project.repository.PersonRepository;
 import com.academy.my_first_spring_project.entity.Person;
+import com.academy.my_first_spring_project.repository.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -121,10 +121,21 @@ public class PersonService {
         personRepository.deleteById(id);
     }
 
-    public Person createExamplePerson() {
-        return Person.builder()
+    public List<Person> createExamplePersons() {
+        Person person1 = Person.builder()
                 .id(7L)
                 .name("Paul")
                 .build();
+
+        Person person2 = Person.builder()
+                .id(8L)
+                .name("Anna")
+                .build();
+
+        List<Person> personList = new ArrayList<>();
+        personList.add(person1);
+        personList.add(person2);
+
+        return personList;
     }
 }

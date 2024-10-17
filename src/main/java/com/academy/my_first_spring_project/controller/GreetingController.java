@@ -1,12 +1,16 @@
 package com.academy.my_first_spring_project.controller;
 
-import com.academy.my_first_spring_project.service.PersonService;
 import com.academy.my_first_spring_project.entity.Person;
+import com.academy.my_first_spring_project.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.List;
 
 @Controller
 public class GreetingController {
@@ -27,12 +31,12 @@ public class GreetingController {
 
     @GetMapping(value = "/greeting", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public Person personJson() {
-        // Objekt erstellen, zB aus Datenbank holen, sonstige Business-Logik
-        Person person = personService.createExamplePerson();
+    public List<Person> personJson() {
+        // Objekt erstellen, z. B. aus Datenbank holen, sonstige Business-Logik
+        List<Person> personList = personService.createExamplePersons();
         // zB stattdessen so eine Business-Logik, die mir eine Person mit Id 7 aus der Datenbank holt:
-//        Person person = personRepository.findById(7);
+        // Person person = personRepository.findById(7);
 
-        return person;
+        return personList;
     }
 }

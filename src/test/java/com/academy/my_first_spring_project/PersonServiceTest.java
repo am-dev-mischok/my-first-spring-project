@@ -3,7 +3,6 @@ package com.academy.my_first_spring_project;
 import com.academy.my_first_spring_project.entity.Person;
 import com.academy.my_first_spring_project.repository.PersonRepository;
 import com.academy.my_first_spring_project.service.PersonService;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
