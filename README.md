@@ -1916,6 +1916,64 @@ Super Link von Baeldung: https://www.baeldung.com/spring-security-authentication
 
 Netter Einstiegslink zu Uni Tests bei Spring Boot, unter der Überschrift "Add Unit Tests": https://spring.io/guides/gs/spring-boot#_add_unit_tests
 
+----------
+
+Tests laufen lassen bei Github:
+
+https://github.com/am-dev-mischok/my-first-spring-project/pull/3
+https://github.com/actions/checkout?tab=readme-ov-file#whats-new
+https://github.com/actions/setup-java
+https://github.com/actions/cache
+1. Click on Actions
+2. Click on Skip this and set up a workflow yourself
+   Now an editor opens up on the right you find actions and documentation to it.
+
+```
+name: Spring Boot Test
+
+# Run the action on pushes and pull requests
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      # Set up JDK 17 (or your desired version)
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin' # Use the Temurin distribution of OpenJDK
+          java-version: '17'
+
+      # Cache Maven dependencies to speed up builds
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      # Run Maven build and tests
+      - name: Build
+        run: mvn clean install
+
+      # Run tests
+      - name: Run tests
+        run: mvn test
+```
+
+----------
 
 
 
