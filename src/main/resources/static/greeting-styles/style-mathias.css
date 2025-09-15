@@ -1,6 +1,29 @@
+
 p {
-    font-size: 6rem;
-    font-family: comic;
+    color: darkorchid;
+    background-color: honeydew;
+    padding: 0.5rem 4rem;
+
+    transition: background-color 0.5s, scale 0.5s, rotate 1s;
+
     font-weight: bold;
-    background-color: aqua;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 4rem;
+}
+
+p:hover {
+    background-color: darkslategray;
+    scale: 1.2 1.2;
+    rotate: -5deg;
+}
+
+body {
+    background-color: lavenderblush;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    height: 100vh;
+    width: 100vw;
 }

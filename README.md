@@ -85,7 +85,7 @@ Folgende Funktionalitäten werden wir haben:
 
 Wir starten mit der Grundstruktur, die wir aus dem [Spring initializr](https://start.spring.io/) herausbekommen.
 ![Screenshot vom Initializr mit ausgewählten Sachen](images/initializr.png "Screenshot vom Initializr mit ausgewählten Sachen")
-- entweder die Vorauswahl in [diesem pre-initialized project](https://start.spring.io/#!type=maven-project&language=java&packaging=jar&jvmVersion=17&groupId=com.example&artifactId=my_first_spring_project&name=my_first_spring_project&description=Spring-Projekt%20mit%20grundlegenden%20Funktionen&packageName=com.example.my_first_spring_project&dependencies=web,thymeleaf,devtools) nehmen, Textfelder ausfüllen und mit Klick auf den Button "GENERATE" herunterladen
+- entweder die Vorauswahl in [diesem pre-initialized project](https://start.spring.io/#!type=maven-project&language=java&packaging=jar&jvmVersion=17&groupId=com.example&artifactId=my_first_spring_project&name=my_first_spring_project&description=Spring-Projekt%20mit%20grundlegenden%20Funktionen&packageName=com.academy.my_first_spring_project&dependencies=web,thymeleaf,devtools) nehmen, Textfelder ausfüllen und mit Klick auf den Button "GENERATE" herunterladen
 - oder selbst im [Spring initializr](https://start.spring.io/) mit Auswahl:
   - Maven als Buildtool
   - Textfelder passend ausfüllen

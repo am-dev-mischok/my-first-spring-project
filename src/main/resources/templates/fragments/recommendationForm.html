@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Fragments</title>
+</head>
+<body>
+
+<!-- Only three modes available: create, edit, view -->
+<div th:fragment="recommendationForm (mode, recommendation, persons)">
+    <!-- Form action URL depends on the mode: 'edit' or 'create' -->
+    <form th:action="${mode == 'edit'} ? @{/recommendation/update/{id}(id=${recommendation.id})} : @{/recommendation/create}"
+          th:object="${recommendation}" method="post">
+        <!-- Hidden input to handle PUT method when editing, POST method when creating -->
+        <input type="hidden" name="_method" th:value="${mode == 'edit'} ? 'PUT' : 'POST'"/>
+        <table class="table table-bordered">
+            <!-- URL field -->
+            <tr>
+                <td>
+                    <label for="url" class="form-label">URL:</label>
+                </td>
+                <td>
+                    <!-- URL input, disabled in view mode -->
+                    <input type="text" id="url" name="url" class="form-control" required
+                           th:field="${recommendation.url}"
+                           th:placeholder="${mode == 'create'} ? 'Link zur Empfehlung' : ''"
+                           th:disabled="${mode == 'view'}"/>
+                </td>
+            </tr>
+            <!-- Name field -->
+            <tr>
+                <td>
+                    <label for="name" class="form-label">Name:</label>
+                </td>
+                <td>
+                    <!-- Name input, disabled in view mode -->
+                    <input type="text" id="name" name="name" class="form-control" required maxlength="255"
+                           th:field="${recommendation.name}"
+                           th:placeholder="${mode == 'create'} ? '' : ''"
+                           th:disabled="${mode == 'view'}"/>
+                </td>
+            </tr>
+            <!-- Rating field -->
+            <tr>
+                <td>
+                    <label for="rating" class="form-label">Bewertung:</label>
+                </td>
+                <td>
+                    <!-- Rating input, disabled in view mode -->
+                    <input type="number" id="rating" name="rating" class="form-control" min="0" max="10"
+                           required th:field="${recommendation.rating}"
+                           th:placeholder="${mode == 'create'} ? 'von 0 bis 10' : ''"
+                           th:disabled="${mode == 'view'}"/>
+                </td>
+            </tr>
+            <!-- Description field -->
+            <tr>
+                <td>
+                    <label for="description" class="form-label">Beschreibung:</label>
+                </td>
+                <td>
+                    <!-- Description textarea, disabled in view mode -->
+                    <textarea id="description" rows="8" name="description" class="form-control" required
+                              th:field="${recommendation.description}"
+                              th:placeholder="${mode == 'create'} ? 'warum ist diese Seite empfehlenswert?' : ''"
+                              th:disabled="${mode == 'view'}"></textarea>
+                </td>
+            </tr>
+            <!-- Target group field -->
+            <tr>
+                <td>
+                    <label for="singleTargetGroup" class="form-label">Zielgruppe:</label>
+                </td>
+                <td>
+                    <!-- Target group select, disabled in view mode -->
+                    <select id="singleTargetGroup" name="targetGroup" class="form-select" required
+                            th:field="${recommendation.targetGroup}"
+                            th:disabled="${mode == 'view'}">
+                        <!-- Options dynamically loaded from the TargetGroup enum values -->
+                        <option th:each="group: ${T(com.academy.my_first_spring_project.enums.TargetGroup).values()}"
+                                th:value="${group}" th:text="${group.label}"></option>
+                    </select>
+                </td>
+            </tr>
+            <!-- Discoverer field -->
+            <tr>
+                <td>
+                    <label for="discoverer" class="form-label">Entdecker:</label>
+                </td>
+                <td>
+                    <!-- Discoverer select, disabled in view mode -->
+                    <select id="discoverer" name="discovererId" class="form-select" required
+                            th:field="${recommendation.discoverer.id}" th:disabled="${mode == 'view'}">
+                        <!-- Options dynamically loaded from the persons list -->
+                        <option th:each="person: ${persons}" th:value="${person.id}" th:text="${person.name}"></option>
+                    </select>
+                </td>
+            </tr>
+        </table>
+        <div class="row mt-3">
+            <div class="col text-right">
+                <!-- Back button, visible in edit or view mode -->
+                <a th:if="${mode == 'edit'} or ${mode == 'view'}" href="/recommendation" class="btn btn-secondary">Zurück
+                    zur Übersicht</a>
+            </div>
+            <!-- Edit mode actions -->
+            <div class="col-auto text-left" th:if="${mode == 'edit'}">
+                <!-- Delete button with confirmation dialog -->
+                <button type="button" class="btn btn-danger"
+                        onclick="if(confirm('Willst du diese Empfehlung wirklich löschen?')) {
+                        document.getElementById('delete-form').submit();
+                    }">Empfehlung löschen
+                </button>
+                <!-- Save changes button -->
+                <button type="submit" class="btn btn-primary">Änderungen speichern</button>
+            </div>
+            <!-- Create mode actions -->
+            <div class="col-auto text-left" th:if="${mode == 'create'}">
+                <!-- Save button -->
+                <button type="submit" class="btn btn-primary">Speichern</button>
+            </div>
+        </div>
+    </form>
+    <!-- Hidden delete form used for deletion action -->
+    <form id="delete-form" th:action="@{/recommendation/delete}" method="post" style="display:none;">
+        <input type="hidden" name="_method" value="DELETE"/>
+        <input type="hidden" name="id" th:value="${recommendation.id}"/>
+    </form>
+</div>
+</body>
+</html>

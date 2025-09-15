@@ -1,141 +1,94 @@
 package com.academy.my_first_spring_project.service;
 
+
 import com.academy.my_first_spring_project.entity.Person;
 import com.academy.my_first_spring_project.repository.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Service class for managing Person entities.
+ * Provides methods to perform CRUD operations on Person objects.
+ * Utilizes a PersonRepository for database interactions.
+ */
 @Service
 public class PersonService {
-
-    private final int ADULT_MIN_AGE = 18;
 
     @Autowired
     private PersonRepository personRepository;
 
+    /**
+     * Retrieves all Person entities from the repository.
+     *
+     * @return a list of all Person entities.
+     */
     public List<Person> getAll() {
         return personRepository.findAll();
     }
 
+    /**
+     * Retrieves a Person entity by its ID.
+     *
+     * @param id the ID of the Person to retrieve
+     * @return the Person entity with the specified ID
+     * @throws RuntimeException if the Person with the specified ID is not found
+     */
     public Person getById(Long id) {
-        Optional<Person> personOptional = personRepository.findById(id);
+        Optional<Person> person = personRepository.findById(id);
 
-        if (personOptional.isEmpty()) {
-            throw new RuntimeException("no person found with this id");
+        if (person.isEmpty()) {
+            throw new RuntimeException("person not found");
         }
 
-        return personOptional.get();
-
-        // oder so:
-//        return personRepository.findById(id)
-//                .orElseThrow();
+        return person.get();
     }
 
+    /**
+     * Creates and saves a new Person entity.
+     * If the Person entity already has an id, a RuntimeException is thrown.
+     *
+     * @param person The Person entity to be created. It must not have an id.
+     * @return The saved Person entity with its new id assigned.
+     * @throws RuntimeException if the Person entity to be saved already has an id.
+     */
     public Person create(Person person) throws RuntimeException {
-        // wir sollten checken, dass das neu zu erstellende Objekt keine id hat, denn diese wird automatisch vergeben von JPA
-        if (person.getId() != null) {
-            throw new RuntimeException("new person is not allowed to have an id already; let the database assign an available id");
+        if (person.getId() == null) {
+            return personRepository.save(person);
+        } else {
+            throw new RuntimeException("person to save has an id");
         }
+    }
 
-        if (person.getAge() < ADULT_MIN_AGE) {
-            throw new RuntimeException("person's age too low, is not an adult");
+    /**
+     * Updates an existing Person entity in the repository.
+     * Throws a RuntimeException if the Person does not have an ID or if the Person does not exist in the repository.
+     *
+     * @param person the Person entity to be updated. Must contain a valid ID.
+     * @return the updated Person entity
+     * @throws RuntimeException if the Person does not have an ID or does not exist in the repository
+     */
+    public Person update(Person person) throws RuntimeException {
+        if (person.getId() == null) {
+            throw new RuntimeException("person to save has no id");
         }
+        Optional<Person> existingPerson = personRepository.findById(person.getId());
 
-        // da der Name "null" sein darf, jedoch nicht leer oder nur Leerzeichen enthalten darf,
-        // prüfen wir zuerst auf "nicht null" und anschließend auf "isBlank"
-        if (person.getName() != null && person.getName().isBlank()) {
-            throw new RuntimeException("person may not have a blank name");
-        }
-
-        List<String> offensiveNames = new ArrayList<>();
-        offensiveNames.add("arsch");
-        offensiveNames.add("depp");
-        offensiveNames.add("trottel");
-
-        if (person.getName() != null && offensiveNames.contains(person.getName().toLowerCase())) {
-            throw new RuntimeException("person has an offensive name");
-        }
-
-        if (person.getEmail() != null && person.getEmail().isBlank()) {
-            throw new RuntimeException("person may not have a blank email");
-        }
-
-        // dieses Regex Pattern ist extra einfach gehalten. Dies ist kein gültiges regex Pattern für die Prüfung einer E-Mail-Adresse.
-        // Normalerweise wird für die E-Mail-Adresse ein komplexeres regex Pattern verwendet,
-        // welches dann auch die richtigen Sachen bei der E-Mail prüft.
-        if (person.getEmail() != null && !person.getEmail().matches("[a-zA-Z0-9]+@[a-zA-Z0-9]+\\.[a-z]+")) {
-            throw new RuntimeException("person must have a valid email");
+        if (existingPerson.isEmpty()) {
+            throw new RuntimeException("person to update does not exist");
         }
 
         return personRepository.save(person);
     }
 
-    public Person update(Person person) throws RuntimeException {
-        if (person.getId() == null) {
-            throw new RuntimeException("person to save has no id");
-        }
-
-        Optional<Person> existingPerson = personRepository.findById(person.getId());
-
-        if (existingPerson.isEmpty()) {
-            throw new RuntimeException("person to save has id, but person with this id cannot be found in database");
-        }
-
-        if (person.getAge() < ADULT_MIN_AGE) {
-            throw new RuntimeException("person's age too low, is not an adult");
-        }
-
-        // da der Name "null" sein darf, jedoch nicht leer oder nur Leerzeichen enthalten darf,
-        // prüfen wir zuerst auf "nicht null" und anschließend auf "isBlank"
-        if (person.getName() != null && person.getName().isBlank()) {
-            throw new RuntimeException("person may not have a blank name");
-        }
-
-        if (person.getEmail() != null && person.getEmail().isBlank()) {
-            throw new RuntimeException("person may not have a blank email");
-        }
-
-        // dieses Regex Pattern ist extra einfach gehalten. Dies ist kein gültiges regex Pattern für die Prüfung einer E-Mail-Adresse.
-        // Normalerweise wird für die E-Mail-Adresse ein komplexeres regex Pattern verwendet,
-        // welches dann auch die richtigen Sachen bei der E-Mail prüft.
-        if (person.getEmail() != null && !person.getEmail().matches("[a-zA-Z0-9]+@[a-zA-Z0-9]+\\.[a-z]+")) {
-            throw new RuntimeException("person must have a valid email");
-        }
-
-        Person updatedPerson = personRepository.save(person);
-        return updatedPerson;
-
-        // oder so:
-//        if (personRepository.existsById(person.getId())) { // throws IllegalArgumentException if id passed into existsById is null
-//            return personRepository.save(person);
-//        } else {
-//            throw new RuntimeException("person to save has id, but person with this id cannot be found in database");
-//        }
-    }
-
+    /**
+     * Deletes a person entity with the given ID from the repository.
+     *
+     * @param id the ID of the person entity to be deleted
+     */
     public void delete(Long id) {
         personRepository.deleteById(id);
-    }
-
-    public List<Person> createExamplePersons() {
-        Person person1 = Person.builder()
-                .id(7L)
-                .name("Paul")
-                .build();
-
-        Person person2 = Person.builder()
-                .id(8L)
-                .name("Anna")
-                .build();
-
-        List<Person> personList = new ArrayList<>();
-        personList.add(person1);
-        personList.add(person2);
-
-        return personList;
     }
 }

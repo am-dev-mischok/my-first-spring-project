@@ -1,73 +1,109 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Meine Hauptseite</title>
+    <!-- Set the character encoding and content type -->
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+
+    <!-- Set the title of the webpage -->
+    <title>Meine Seite</title>
+
+    <!-- Ensure the page is properly scaled on all devices -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Include Bootstrap CSS for styling -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Include Bootstrap JavaScript bundle for interactive components -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Links to Bootstrap Icons for adding customizable icons to the webpage -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- Link to custom stylesheet -->
+    <link href="/styles/main.css" rel="stylesheet">
 </head>
 <body>
-  <p>
-    Gerade angekommen? <a href="/greeting">Hier entlang.</a>
-  </p>
-  <p>
-    Hier gehts zu Mathias! <a href="/greeting?n=Mathias&css=style-mathias">bitte hier</a>.
-  </p>
-  <p>
-    Hello there! General Kenobi! <a href="/greeting?n=Kenobi&css=style-stefan">bitte hier</a>.
-  </p>
-  <p>
-    Hallöchen!!! Klicke <a href="/greeting?n=Max&css=style-max">hier</a>.
-  </p>
-  <p>
-    Wer ist <a href="/greeting?n=Jasmin&css=style-jasmin">Jasmin?</a>.
-  </p>
-
-  <h2>Begrüßungs-Generator</h2>
-  <form action="/greeting" method="GET">
-    <div>
-      <label for="userInput">Dein Name?</label>
-      <input name="n" id="userInput" placeholder="Gib deinen Namen ein" />
-    </div>
-    <div>
-      <label for="styling">Styling?</label>
-      <select name="css" id="styling">
-        <option value="" selected>Standard</option>
-        <option value="style-mathias">Mathias</option>
-        <option value="style-stefan">Stefan</option>
-        <option value="style-max">Max</option>
-        <option value="style-jasmin">Jasmin</option>
-        <option value="style-alex">Alex</option>
-        <option value="a">Leer</option>
-      </select>
-    </div>
-    <div>
-      <button>Hallo?</button>
-    </div>
-  </form>
-
-  <h2>Person speichern</h2>
-  <p>
-    Neuerdings kann man auf dieser Webseite auch Personen speichern. Wow! Fülle dafür das folgende Formular aus und schicke es mit dem Absenden-Button ab.
-  </p>
-  <form action="/person" method="POST">
-    <div>
-      <label for="name">Name</label>
-      <input name="name" id="name" type="text" placeholder="Gib deinen Namen ein" />
-    </div>
-    <div>
-      <label for="email">E-Mail-Adresse</label>
-      <input name="email" id="email" type="email" placeholder="und deine E-Mail" />
-    </div>
-    <div>
-      <label for="age">Alter</label>
-      <input name="age" id="age" type="number" value="25" />
-    </div>
-    <div>
-      <input name="married" id="married" type="checkbox" />
-      <label for="married">Verheiratet?</label>
-    </div>
-    <div>
-      <button>Absenden</button>
-    </div>
-  </form>
+<!-- Main container with light background filling full height -->
+<div class="container bg-light cover-height-full">
+    <header class="container bg-secondary">
+        <div class="row justify-content-between align-items-center">
+            <div class="col-auto">
+                <h1 class="mb-0">WILLKOMMEN</h1>
+            </div>
+            <div class="col-auto">
+                <a class="btn btn-primary" href="/logout">Abmelden</a>
+            </div>
+        </div>
+    </header>
+    <main>
+        <!-- Section for newly arrived users -->
+        <p>
+            Gerade angekommen? <a href="/greeting">Hier entlang.</a>
+        </p>
+        <p>
+            <!-- Personalized greeting link for Alex with specific styling -->
+            Bist du Alex? Dann <a href="/greeting?name=Alex&css=style-alex">bitte hier</a>
+        </p>
+        <!-- Header for the greeting generator form -->
+        <h2>Begrüßungs-Generator</h2>
+        <!-- Form to create a greeting with user's name and optional styling -->
+        <form action="greeting" method="GET" class="form-control">
+            <div class="mb-3">
+                <!-- Label and input field for user's name -->
+                <label for="userInput" class="form-label">Dein Name</label>
+                <input name="name" id="userInput" class="form-control" placeholder="Gib deinen Namen ein"/>
+            </div>
+            <div class="mb-3">
+                <!-- Label and select dropdown for choosing a style -->
+                <label for="styling" class="form-label">Styling?</label>
+                <select name="css" id="styling" class="form-select">
+                    <!-- Options for choosing a style -->
+                    <option value="">Standart</option>
+                    <option value="style-mathias">Mathias</option>
+                    <option value="style-stefan">Stefan</option>
+                    <option value="style-max">Max</option>
+                    <option value="style-jasmin">Jasmin</option>
+                    <option value="style-alex">Alex</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <!-- Button to submit the greeting form -->
+                <button type="submit" class="btn btn-primary">Hallo?</button>
+            </div>
+        </form>
+        <!-- Header for the person storage form -->
+        <h2>Personen speichern</h2>
+        <p>
+            <!-- Instruction for users about the new feature to save person details -->
+            Neuerdings kann man auf dieser Webseite auch Personen speichern. Wow! Fülle dafür das folgende Formular aus.
+        </p>
+        <!-- Form to save person details -->
+        <form action="/person" method="POST" class="form-control">
+            <div class="mb-3">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" name="name" id="name" class="form-control" placeholder="Gib deinen Namen ein"/>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">E-Mail-Adresse</label>
+                <input type="email" name="email" id="email" class="form-control"
+                       placeholder="Gib deine Email-Adresse ein"/>
+            </div>
+            <div class="mb-3">
+                <label for="age" class="form-label">Alter</label>
+                <input type="number" name="age" id="age" class="form-control" placeholder="Gib dein Alter ein"/>
+            </div>
+            <div class="form-check mb-3">
+                <input type="checkbox" name="married" id="married" class="form-check-input"/>
+                <label for="married" class="form-check-label">Verheiratet?</label>
+            </div>
+            <div class="mb-3">
+                <button type="submit" class="btn btn-primary">Absenden</button>
+            </div>
+        </form>
+        <div class="row">
+            <a class="btn btn-secondary" href="/recommendation">Zu den Empfehlungen</a>
+        </div>
+    </main>
+</div>
 </body>
 </html>
